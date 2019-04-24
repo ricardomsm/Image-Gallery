@@ -11,18 +11,25 @@ import UIKit
 class ImageGalleryViewController: UIViewController {
 
     //MARK: - Outlets and variables
-    @IBOutlet weak var imageGalleryCollectionView: UICollectionView!
-    @IBOutlet weak var imageSearchBar: UISearchBar!
+    @IBOutlet var imageGalleryCollectionView: UICollectionView!
+    @IBOutlet var imageSearchBar: UISearchBar!
     
     //MARK: - Life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         
         APIService.shared.fetchImages(withText: "kitten")
+        setupSearchBar()
         setupImageGalleryCollectionView()
     }
     
     //MARK: - UI setup
+    private func setupSearchBar() {
+        
+        imageSearchBar.delegate = self
+        imageSearchBar.placeholder = "Search for an image..."
+    }
+    
     private func setupImageGalleryCollectionView() {
         
         let galleryLayout = UICollectionViewFlowLayout()
@@ -52,4 +59,12 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
     
     
     
+}
+
+//MARK: - Search bar delegate methods
+extension ImageGalleryViewController: UISearchBarDelegate {
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+    }
 }
