@@ -1,23 +1,32 @@
-# Exclude the build directory
-build/*
+# Xcode
+#
+# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
-# Exclude temp nibs and swap files
-*~.nib
-*.swp
+## Build generated
+build/
+DerivedData/
 
-# Exclude OS X folder attributes
-.DS_Store
-
-# Exclude user-specific XCode 3 and 4 files
-*.mode1
-*.mode1v3
-*.mode2v3
-*.perspective
-*.perspectivev3
+## Various settings
 *.pbxuser
-*.xcworkspace
-*.xcuserdata
-*.xcuserstate
-*.xcshareddata
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
 
+## Other
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+
+## Obj-C/Swift specific
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# CocoaPods
 Pods/
