@@ -29,12 +29,15 @@ class APIService {
         
         URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
             
+            print(response)
+            
             if let error = error {
                 print(error)
                 return
             }
             
             guard let data = data else { print("Error getting data"); return }
+            print(data)
             
             let decoder = JSONDecoder()
             
