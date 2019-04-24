@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="cQY-JA-Ska">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Image Gallery View Controller-->
+        <scene sceneID="dL4-4X-lav">
+            <objects>
+                <viewController id="cQY-JA-Ska" userLabel="Image Gallery View Controller" customClass="ImageGalleryViewController" customModule="Image_Gallery" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="paY-uv-PYW">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="7Tb-VZ-tJI">
+                                <rect key="frame" x="0.0" y="100" width="414" height="796"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="rym-aI-DGq">
+                                    <size key="itemSize" width="143" height="160"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="photoCell" id="he4-oC-22M" customClass="PhotoCollectionViewCell" customModule="Image_Gallery" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="143" height="160"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
+                                            <rect key="frame" x="0.0" y="0.0" width="143" height="160"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </view>
+                                        <color key="backgroundColor" red="0.1137254902" green="0.21960784310000001" blue="0.3803921569" alpha="1" colorSpace="calibratedRGB"/>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
+                            <searchBar contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="1j3-zh-1ce">
+                                <rect key="frame" x="0.0" y="44" width="414" height="56"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </searchBar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="1j3-zh-1ce" firstAttribute="leading" secondItem="ae6-J0-nNo" secondAttribute="leading" id="Lm9-WO-Jjv"/>
+                            <constraint firstItem="7Tb-VZ-tJI" firstAttribute="leading" secondItem="ae6-J0-nNo" secondAttribute="leading" id="Ml7-hA-x72"/>
+                            <constraint firstItem="7Tb-VZ-tJI" firstAttribute="top" secondItem="1j3-zh-1ce" secondAttribute="bottom" id="brq-AK-nAA"/>
+                            <constraint firstItem="1j3-zh-1ce" firstAttribute="top" secondItem="ae6-J0-nNo" secondAttribute="top" id="h3K-oK-QyX"/>
+                            <constraint firstItem="7Tb-VZ-tJI" firstAttribute="trailing" secondItem="ae6-J0-nNo" secondAttribute="trailing" id="lqp-62-Bh0"/>
+                            <constraint firstAttribute="bottom" secondItem="7Tb-VZ-tJI" secondAttribute="bottom" id="yAZ-RS-aTW"/>
+                            <constraint firstItem="1j3-zh-1ce" firstAttribute="trailing" secondItem="ae6-J0-nNo" secondAttribute="trailing" id="yPe-0z-X53"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="ae6-J0-nNo"/>
+                    </view>
+                    <connections>
+                        <outlet property="imageGalleryCollectionView" destination="7Tb-VZ-tJI" id="cWH-M4-hvu"/>
+                        <outlet property="imageSearchBar" destination="1j3-zh-1ce" id="MSo-U7-sYe"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="hPW-st-UhJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-150.72463768115944" y="186.83035714285714"/>
+        </scene>
+    </scenes>
+</document>
