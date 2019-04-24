@@ -8,6 +8,11 @@
 
 import UIKit
 
+struct ImageGalleryDimensions {
+    fileprivate static let trailingAndLeadingMargin: CGFloat = 15
+    fileprivate static let imageHeight: CGFloat = 150
+}
+
 class ImageGalleryViewController: UIViewController {
 
     //MARK: - Outlets and variables
@@ -18,7 +23,6 @@ class ImageGalleryViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        APIService.shared.fetchImages(withText: "kitten")
         setupSearchBar()
         setupImageGalleryCollectionView()
     }
@@ -32,9 +36,16 @@ class ImageGalleryViewController: UIViewController {
     
     private func setupImageGalleryCollectionView() {
         
+        let imageWidth: CGFloat = (view.frame.width / 2) - 45
+        
         let galleryLayout = UICollectionViewFlowLayout()
-        galleryLayout.sectionInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
-        galleryLayout.itemSize = CGSize(width: (view.frame.width / 2) - 45, height: 150)
+        galleryLayout.sectionInset = UIEdgeInsets(
+            top: 0,
+            left: ImageGalleryDimensions.trailingAndLeadingMargin,
+            bottom: 0,
+            right: ImageGalleryDimensions.trailingAndLeadingMargin
+        )
+        galleryLayout.itemSize = CGSize(width: imageWidth, height: ImageGalleryDimensions.imageHeight)
         
         imageGalleryCollectionView.collectionViewLayout = galleryLayout
         imageGalleryCollectionView.delegate = self
@@ -65,6 +76,6 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
 extension ImageGalleryViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
+        APIService.shared.fetchImages(withText: "kitten")
     }
 }

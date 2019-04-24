@@ -10,9 +10,9 @@ import Foundation
 
 struct Photos: Codable {
     
-    var page    : Int
-    var pages   : Int
-    var perPage : Int
-    var total   : Int
+    var page    : Int?
+    var pages   : Int?
+    var perPage : Int?
+    var total   : Int?
 //    var photo: [Photo]?
 }

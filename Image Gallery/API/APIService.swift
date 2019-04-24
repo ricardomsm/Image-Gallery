@@ -18,11 +18,14 @@ class APIService {
     func fetchImages(withText text: String?) {
         
         guard var urlComponents = URLComponents(string: baseUrl) else { print("Error generating url components from string"); return }
+        
+        let endpointQueryItem    = URLQueryItem(name: "method", value: "flickr.photos.search")
+        let apiKeyQueryItem      = URLQueryItem(name: "api_key", value: APIKey)
+        let tagsQueryItem        = URLQueryItem(name: "tags", value: text)
+        let jsonFormatQueryItem  = URLQueryItem(name: "format", value: "json")
+        urlComponents.queryItems = [endpointQueryItem, apiKeyQueryItem, tagsQueryItem, jsonFormatQueryItem]
+        
         guard let url = urlComponents.url else { print("Error getting url"); return }
-        let endpointQueryItem = URLQueryItem(name: "method", value: "flickr.photos.search")
-        let apiKeyQueryItem = URLQueryItem(name: "api_key", value: APIKey)
-        let tagsQueryItem = URLQueryItem(name: "tags", value: text)
-        urlComponents.queryItems = [endpointQueryItem, apiKeyQueryItem, tagsQueryItem]
         
         URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
             
