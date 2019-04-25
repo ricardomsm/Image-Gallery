@@ -35,7 +35,6 @@ class ImageGalleryViewController: UIViewController {
         
         imageSearchBar.delegate = self
         imageSearchBar.placeholder = "Search for an image..."
-        imageSearchBar.showsSearchResultsButton = true
     }
     
     private func setupImageGalleryCollectionView() {
@@ -80,8 +79,11 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
     
     private func setupCell(withUrl url: String?, image: UIImage?, and cell: PhotoCollectionViewCell) {
         
+        cell.imageView.isHidden = true
+        
         if image != nil {
             cell.imageView.image = image
+            cell.imageView.isHidden = false
         } else {
             if let imageUrl = url {
                 
@@ -98,6 +100,7 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
                         DispatchQueue.main.async {
                             if cell.imageUrl == imageUrl {
                                 cell.imageView.image = image
+                                cell.imageView.isHidden = false
                             }
                         }
                     } catch let error {
