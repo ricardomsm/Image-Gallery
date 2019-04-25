@@ -71,6 +71,7 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
         
         if let imageURL = tilesArray[indexPath.row].source {
             
+            cell.imageUrl = imageURL
             setupCell(withUrl: imageURL, image: imageCache.object(forKey: NSString(string: imageURL)), and: cell)
         }
     
@@ -95,7 +96,9 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
                         self.imageCache.setObject(image!, forKey: NSString(string: imageUrl))
                         
                         DispatchQueue.main.async {
-                            cell.imageView.image = image
+                            if cell.imageUrl == imageUrl {
+                                cell.imageView.image = image
+                            }
                         }
                     } catch let error {
                         print(error)
@@ -113,6 +116,10 @@ extension ImageGalleryViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         view.endEditing(true)
+        sizeArray = []
+        tilesArray = []
+        imageCache.removeAllObjects()
+        imageGalleryCollectionView.reloadData()
         
         APIService.shared.fetchImages(withText: searchBar.text, success: { sizeArray in
             

@@ -10,7 +10,8 @@ import UIKit
 
 class PhotoCollectionViewCell: UICollectionViewCell {
     
-    var imageView: UIImageView!
+    var imageView : UIImageView!
+    var imageUrl  = ""
     
     override init(frame: CGRect) {
         super.init(frame: frame)
