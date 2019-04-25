@@ -6,25 +6,25 @@
 //  Copyright © 2019 ricardomm. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 class APIService {
     
     static let shared = APIService()
     
-    private let APIKey  = "f9cc014fa76b098f9e82f1c288379ea1"
-    private let baseUrl = "https://api.flickr.com/services/rest/"
+    private let APIKey                     = "f9cc014fa76b098f9e82f1c288379ea1"
+    private let baseUrl                    = "https://api.flickr.com/services/rest/"
+    private lazy var apiKeyQueryItem       = URLQueryItem(name: "api_key", value: APIKey)
+    private lazy var jsonFormatQueryItem   = URLQueryItem(name: "format", value: "json")
+    private lazy var jsonCallbackQueryItem = URLQueryItem(name: "nojsoncallback", value: "1")
     
     func fetchImages(withText text: String?) {
         
         guard var urlComponents = URLComponents(string: baseUrl) else { print("Error generating url components from string"); return }
         
         let endpointQueryItem     = URLQueryItem(name: "method", value: "flickr.photos.search")
-        let apiKeyQueryItem       = URLQueryItem(name: "api_key", value: APIKey)
         let tagsQueryItem         = URLQueryItem(name: "tags", value: text)
-        let jsonFormatQueryItem   = URLQueryItem(name: "format", value: "json")
-        let jsonCallbackQueryItem = URLQueryItem(name: "nojsoncallback", value: "1")
-        urlComponents.queryItems  = [
+        urlComponents.queryItems = [
             endpointQueryItem,
             apiKeyQueryItem,
             tagsQueryItem,
@@ -34,9 +34,13 @@ class APIService {
         
         guard let url = urlComponents.url else { print("Error getting url"); return }
         
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        
         URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
             
-            print(response)
+            let response = response as? HTTPURLResponse
+            print("Response status code: \(String(describing: response?.statusCode))")
+            print("Response: \(String(describing: response))")
             
             if let error = error {
                 print(error)
@@ -44,24 +48,26 @@ class APIService {
             }
             
             guard let data = data else { print("Error getting data"); return }
-            print(data)
-            
+
             let decoder = JSONDecoder()
             
             do {
-                let photos = try decoder.decode(Photos.self, from: data)
-                print(photos)
+                let searchPhotosResponse = try decoder.decode(SearchPhotosResponse.self, from: data)
                 
-                self?.fetchPhotoImage()
+                searchPhotosResponse.photos?.photo?.forEach({ self?.fetchPhotoImage(withId: $0.id!) })
+                
             } catch let error {
                 print(error)
             }
             
         }.resume()
+        
+        UIApplication.shared.isNetworkActivityIndicatorVisible = false
     }
     
-    func fetchPhotoImage() {
-        //TODO: Implement fetching image with photo id
+    func fetchPhotoImage(withId: String) {
+        //TODO: Finish implementing fetching photo images
+        guard var urlComponents = URLComponents(string: baseUrl) else { print("Couldn't get url"); return }
     }
     
 }
