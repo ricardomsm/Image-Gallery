@@ -8,7 +8,15 @@
 
 import Foundation
 
-struct SearchSizeResponse: Codable {
+struct SearchSizeResponse {
     var sizes : Sizes?
     var stat  : String?
+    
+    init(withDictionary dictionary: [String : Any]?) {
+        
+        guard let dictionary = dictionary else { print("error getting dictionary"); return }
+        
+        sizes = dictionary["sizes"] as? Sizes
+        stat  = dictionary["stat"] as? String
+    }
 }

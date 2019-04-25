@@ -8,9 +8,11 @@
 
 import UIKit
 
+
 class APIService {
     
     static let shared = APIService()
+    let urlSession    = URLSession.shared
     
     private let APIKey                     = "f9cc014fa76b098f9e82f1c288379ea1"
     private let baseUrl                    = "https://api.flickr.com/services/rest/"
@@ -36,7 +38,7 @@ class APIService {
         
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
         
-        URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
+        urlSession.dataTask(with: url) { [weak self] (data, response, error) in
             
             let response = response as? HTTPURLResponse
             print("Response status code: \(String(describing: response?.statusCode))")
@@ -81,7 +83,7 @@ class APIService {
         
         guard let url = urlComponents.url else { print("Couldn't get url from url components"); return }
         
-        URLSession.shared.dataTask(with: url) { [weak self]  (data, response, error) in
+        urlSession.dataTask(with: url) { [weak self]  (data, response, error) in
             
             let response = response as? HTTPURLResponse
             print("Response status code: \(String(describing: response?.statusCode))")
@@ -93,12 +95,13 @@ class APIService {
             }
             
             guard let data = data else { print("Error getting data"); return }
-            
-            let decoder = JSONDecoder()
-            
+
             do {
-                let searchSizeResponse = try decoder.decode(SearchSizeResponse.self, from: data)
-                print(searchSizeResponse)
+                let searchSizeJSON = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as! [String : Any]
+                
+                let searchSizeResponse = SearchSizeResponse(withDictionary: searchSizeJSON)
+                let size = searchSizeResponse.sizes?.size?.filter({ $0.label == "Large Square" || $0.label == "Large" })
+                
                 // Call protocol method on view to reload collecttion view data
                 
             } catch let error {
