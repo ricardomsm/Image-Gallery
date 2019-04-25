@@ -65,9 +65,47 @@ class APIService {
         UIApplication.shared.isNetworkActivityIndicatorVisible = false
     }
     
-    func fetchPhotoImage(withId: String) {
-        //TODO: Finish implementing fetching photo images
+    func fetchPhotoImage(withId id: String) {
+        
         guard var urlComponents = URLComponents(string: baseUrl) else { print("Couldn't get url"); return }
+        
+        let endpointQueryItem = URLQueryItem(name: "method", value: "flickr.photos.getSizes")
+        let photoIdQueryItem = URLQueryItem(name: "photo_id", value: id)
+        urlComponents.queryItems = [
+            endpointQueryItem,
+            apiKeyQueryItem,
+            photoIdQueryItem,
+            jsonFormatQueryItem,
+            jsonCallbackQueryItem
+        ]
+        
+        guard let url = urlComponents.url else { print("Couldn't get url from url components"); return }
+        
+        URLSession.shared.dataTask(with: url) { [weak self]  (data, response, error) in
+            
+            let response = response as? HTTPURLResponse
+            print("Response status code: \(String(describing: response?.statusCode))")
+            print("Response: \(String(describing: response))")
+            
+            if let error = error {
+                print(error)
+                return
+            }
+            
+            guard let data = data else { print("Error getting data"); return }
+            
+            let decoder = JSONDecoder()
+            
+            do {
+                let searchSizeResponse = try decoder.decode(SearchSizeResponse.self, from: data)
+                print(searchSizeResponse)
+                // Call protocol method on view to reload collecttion view data
+                
+            } catch let error {
+                print(error)
+            }
+            
+        }.resume()
     }
     
 }

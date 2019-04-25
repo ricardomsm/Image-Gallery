@@ -1,5 +1,5 @@
 //
-//  SearchPhotosResponse.swift
+//  Sizes.swift
 //  Image Gallery
 //
 //  Created by Ricardo Magalhães on 25/04/2019.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct SearchPhotosResponse: Codable {
-    var photos : Photos?
-    var stat   : String?
+struct Sizes: Codable {
+    var canDownload : Bool?
+    var size        : [Size]?
 }

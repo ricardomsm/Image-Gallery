@@ -32,6 +32,7 @@ class ImageGalleryViewController: UIViewController {
         
         imageSearchBar.delegate = self
         imageSearchBar.placeholder = "Search for an image..."
+        imageSearchBar.showsSearchResultsButton = true
     }
     
     private func setupImageGalleryCollectionView() {
@@ -75,7 +76,7 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
 //MARK: - Search bar delegate methods
 extension ImageGalleryViewController: UISearchBarDelegate {
     
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         APIService.shared.fetchImages(withText: "kitten")
     }
 }
