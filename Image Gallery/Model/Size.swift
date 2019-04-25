@@ -10,8 +10,8 @@ import Foundation
 
 struct Size {
     var label  : String?
-    var width  : Int?
-    var height : Int?
+    var width  : String?
+    var height : String?
     var source : String?
     var url    : String?
     var media  : String?
@@ -21,8 +21,8 @@ struct Size {
         guard let dictionary = dictionary else { print("Error getting dictionary"); return }
         
         label  = dictionary["label"] as? String
-        width  = dictionary["width"] as? Int
-        height = dictionary["height"] as? Int
+        width  = dictionary["width"] as? String
+        height = dictionary["height"] as? String
         source = dictionary["source"] as? String
         url    = dictionary["url"] as? String
         media  = dictionary["media"] as? String

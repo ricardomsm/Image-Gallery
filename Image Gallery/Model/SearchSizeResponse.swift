@@ -16,7 +16,7 @@ struct SearchSizeResponse {
         
         guard let dictionary = dictionary else { print("error getting dictionary"); return }
         
-        sizes = dictionary["sizes"] as? Sizes
+        sizes = Sizes(withDictionary: dictionary["sizes"] as? [String : Any])
         stat  = dictionary["stat"] as? String
     }
 }

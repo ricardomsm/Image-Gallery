@@ -20,7 +20,7 @@ class APIService {
     private lazy var jsonFormatQueryItem   = URLQueryItem(name: "format", value: "json")
     private lazy var jsonCallbackQueryItem = URLQueryItem(name: "nojsoncallback", value: "1")
     
-    func fetchImages(withText text: String?) {
+    func fetchImages(withText text: String?, success: @escaping (_ sizeArray: [Size]) -> Void, failure: @escaping (_ error: Error) -> Void) {
         
         guard var urlComponents = URLComponents(string: baseUrl) else { print("Error generating url components from string"); return }
         
@@ -54,9 +54,16 @@ class APIService {
             let decoder = JSONDecoder()
             
             do {
-                let searchPhotosResponse = try decoder.decode(SearchPhotosResponse.self, from: data)
                 
-                searchPhotosResponse.photos?.photo?.forEach({ self?.fetchPhotoImage(withId: $0.id!) })
+                let searchPhotosResponse = try decoder.decode(SearchPhotosResponse.self, from: data)
+                print(searchPhotosResponse)
+                
+                searchPhotosResponse.photos?.photo?.forEach({ self?.fetchPhotoImage(withId: $0.id!, success: { sizeArray in
+                    success(sizeArray)
+                }, failure: { error in
+                    print(error)
+                    failure(error)
+                }) })
                 
             } catch let error {
                 print(error)
@@ -67,7 +74,7 @@ class APIService {
         UIApplication.shared.isNetworkActivityIndicatorVisible = false
     }
     
-    func fetchPhotoImage(withId id: String) {
+    func fetchPhotoImage(withId id: String, success: @escaping (_ sizes: [Size]) -> Void, failure: @escaping (_ error: Error) -> Void) {
         
         guard var urlComponents = URLComponents(string: baseUrl) else { print("Couldn't get url"); return }
         
@@ -83,7 +90,7 @@ class APIService {
         
         guard let url = urlComponents.url else { print("Couldn't get url from url components"); return }
         
-        urlSession.dataTask(with: url) { [weak self]  (data, response, error) in
+        urlSession.dataTask(with: url) { (data, response, error) in
             
             let response = response as? HTTPURLResponse
             print("Response status code: \(String(describing: response?.statusCode))")
@@ -91,21 +98,25 @@ class APIService {
             
             if let error = error {
                 print(error)
-                return
+                failure(error)
             }
             
             guard let data = data else { print("Error getting data"); return }
 
             do {
+                
                 let searchSizeJSON = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as! [String : Any]
+                print(searchSizeJSON)
                 
                 let searchSizeResponse = SearchSizeResponse(withDictionary: searchSizeJSON)
-                let size = searchSizeResponse.sizes?.size?.filter({ $0.label == "Large Square" || $0.label == "Large" })
                 
-                // Call protocol method on view to reload collecttion view data
+                guard let size = searchSizeResponse.sizes?.size?.filter({ $0.label == "Large Square" || $0.label == "Large" }) else { print("Error getting size array"); return }
+                
+                success(size)
                 
             } catch let error {
                 print(error)
+                failure(error)
             }
             
         }.resume()

@@ -12,4 +12,29 @@ class PhotoCollectionViewCell: UICollectionViewCell {
     
     var imageView: UIImageView!
     
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        addImageView()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        addImageView()
+    }
+    
+    private func addImageView() {
+        
+        if imageView == nil {
+            
+            imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height))
+            imageView.contentMode = .scaleAspectFill
+            self.addSubview(imageView)
+        }
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        addImageView()
+    }
+    
 }
