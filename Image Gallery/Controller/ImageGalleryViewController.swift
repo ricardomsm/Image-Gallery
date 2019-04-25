@@ -69,7 +69,7 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCollectionViewCell
         
         if let imageURL = tilesArray[indexPath.row].source {
-            
+            // We use the url as to identify which cell should load which image
             cell.imageUrl = imageURL
             setupCell(withUrl: imageURL, image: imageCache.object(forKey: NSString(string: imageURL)), and: cell)
         }
@@ -79,6 +79,7 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
     
     private func setupCell(withUrl url: String?, image: UIImage?, and cell: PhotoCollectionViewCell) {
         
+        // We use the is hidden property as to hide the cell while there is no image
         cell.imageView.isHidden = true
         
         if image != nil {
@@ -119,10 +120,7 @@ extension ImageGalleryViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         view.endEditing(true)
-        sizeArray = []
-        tilesArray = []
-        imageCache.removeAllObjects()
-        imageGalleryCollectionView.reloadData()
+        cleanGallery()
         
         APIService.shared.fetchImages(withText: searchBar.text, success: { sizeArray in
             
@@ -135,5 +133,12 @@ extension ImageGalleryViewController: UISearchBarDelegate {
         }) { error in
             print(error)
         }
+    }
+    
+    private func cleanGallery() {
+        sizeArray = []
+        tilesArray = []
+        imageCache.removeAllObjects()
+        imageGalleryCollectionView.reloadData()
     }
 }

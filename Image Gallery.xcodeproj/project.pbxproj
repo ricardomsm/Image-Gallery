@@ -68,6 +68,13 @@
 			name = "Custom Cells";
 			sourceTree = "<group>";
 		};
+		4819E9C32272712B00949B2E /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		4862CFE02270E41A00C5E2AD = {
 			isa = PBXGroup;
 			children = (
@@ -92,6 +99,7 @@
 				4862CFFF2270E46400C5E2AD /* View */,
 				4862D0002270E47900C5E2AD /* Controller */,
 				4862D0042270E53600C5E2AD /* API */,
+				4819E9C32272712B00949B2E /* Extensions */,
 				4862D0072270E75200C5E2AD /* Supporting Files */,
 			);
 			path = "Image Gallery";
