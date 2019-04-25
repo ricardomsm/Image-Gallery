@@ -20,6 +20,7 @@
 		4862D00A2270EFE600C5E2AD /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4862D0092270EFE600C5E2AD /* APIService.swift */; };
 		4862D00C22710B2900C5E2AD /* Photos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4862D00B22710B2900C5E2AD /* Photos.swift */; };
 		4862D00E2271293100C5E2AD /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4862D00D2271293100C5E2AD /* Photo.swift */; };
+		48DEAFD4227277F00060273C /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DEAFD3227277F00060273C /* UIImageExtension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		4862D0092270EFE600C5E2AD /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
 		4862D00B22710B2900C5E2AD /* Photos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photos.swift; sourceTree = "<group>"; };
 		4862D00D2271293100C5E2AD /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
+		48DEAFD3227277F00060273C /* UIImageExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +73,7 @@
 		4819E9C32272712B00949B2E /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				48DEAFD3227277F00060273C /* UIImageExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -227,6 +230,7 @@
 				4862D0032270E50900C5E2AD /* ImageGalleryViewController.swift in Sources */,
 				4862D0062270E61600C5E2AD /* PhotoCollectionViewCell.swift in Sources */,
 				4819E9BE2271EE8700949B2E /* Sizes.swift in Sources */,
+				48DEAFD4227277F00060273C /* UIImageExtension.swift in Sources */,
 				4819E9BC2271EE4500949B2E /* SearchSizeResponse.swift in Sources */,
 				4862D00A2270EFE600C5E2AD /* APIService.swift in Sources */,
 				4819E9C02271EECC00949B2E /* Size.swift in Sources */,

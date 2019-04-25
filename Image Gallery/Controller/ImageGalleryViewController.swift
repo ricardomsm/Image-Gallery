@@ -20,7 +20,7 @@ class ImageGalleryViewController: UIViewController {
     @IBOutlet var imageSearchBar             : UISearchBar!
     private lazy var sizeArray               = [Size]()
     private lazy var tilesArray              = [Size]()
-    private lazy  var imageCache             = NSCache<NSString, UIImage>()
+    private lazy var imageCache              = NSCache<NSString, UIImage>()
     
     //MARK: - Life cycle methods
     override func viewDidLoad() {
@@ -86,27 +86,24 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
             cell.imageView.image = image
             cell.imageView.isHidden = false
         } else {
+            
             if let imageUrl = url {
-                
                 DispatchQueue.global(qos: .background).async {
                     
                     guard let url = URL(string: imageUrl) else { print("Error getting url"); return }
                     
-                    do {
-                        let data = try Data(contentsOf: url)
-                        let image = UIImage(data: data)
+                    UIImage.downloadImageFromUrl(url, returns: { image in
                         
-                        self.imageCache.setObject(image!, forKey: NSString(string: imageUrl))
+                        self.imageCache.setObject(image, forKey: NSString(string: imageUrl))
                         
-                        DispatchQueue.main.async {
-                            if cell.imageUrl == imageUrl {
+                        if cell.imageUrl == imageUrl {
+                            
+                            DispatchQueue.main.async {
                                 cell.imageView.image = image
                                 cell.imageView.isHidden = false
                             }
                         }
-                    } catch let error {
-                        print(error)
-                    }
+                    })
                 }
             }
         }
@@ -130,6 +127,7 @@ extension ImageGalleryViewController: UISearchBarDelegate {
             DispatchQueue.main.async {
                 self.imageGalleryCollectionView.reloadData()
             }
+            
         }) { error in
             print(error)
         }
