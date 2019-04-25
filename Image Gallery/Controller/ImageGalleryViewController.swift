@@ -19,6 +19,8 @@ class ImageGalleryViewController: UIViewController {
     @IBOutlet var imageGalleryCollectionView : UICollectionView!
     @IBOutlet var imageSearchBar             : UISearchBar!
     private lazy var sizeArray               = [Size]()
+    private lazy var tilesArray              = [Size]()
+    private lazy  var imageCache             = NSCache<NSString, UIImage>()
     
     //MARK: - Life cycle methods
     override func viewDidLoad() {
@@ -60,38 +62,47 @@ class ImageGalleryViewController: UIViewController {
 extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return sizeArray.filter({ $0.label == "Large Square" }).count
+        return tilesArray.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
+
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCollectionViewCell
         
-        if let imageURL = sizeArray.filter({ $0.label == "Large Square" })[indexPath.row].source {
+        if let imageURL = tilesArray[indexPath.row].source {
             
-            if let image = getImageFrom(url: imageURL) {
-                cell.imageView.image = image
-            } else {
-                cell.imageView.image = UIImage()
-            }
+            setupCell(withUrl: imageURL, image: imageCache.object(forKey: NSString(string: imageURL)), and: cell)
         }
     
         return cell
     }
     
-    private func getImageFrom(url: String) -> UIImage? {
+    private func setupCell(withUrl url: String?, image: UIImage?, and cell: PhotoCollectionViewCell) {
         
-        let url = URL(string: url)
-        
-        do {
-            let data = try Data(contentsOf: url!)
-            let image = UIImage(data: data)
-            return image
-        } catch let error {
-            print(error)
+        if image != nil {
+            cell.imageView.image = image
+        } else {
+            if let imageUrl = url {
+                
+                DispatchQueue.global(qos: .background).async {
+                    
+                    guard let url = URL(string: imageUrl) else { print("Error getting url"); return }
+                    
+                    do {
+                        let data = try Data(contentsOf: url)
+                        let image = UIImage(data: data)
+                        
+                        self.imageCache.setObject(image!, forKey: NSString(string: imageUrl))
+                        
+                        DispatchQueue.main.async {
+                            cell.imageView.image = image
+                        }
+                    } catch let error {
+                        print(error)
+                    }
+                }
+            }
         }
-        
-        return nil
     }
     
 }
@@ -106,6 +117,7 @@ extension ImageGalleryViewController: UISearchBarDelegate {
         APIService.shared.fetchImages(withText: searchBar.text, success: { sizeArray in
             
             self.sizeArray.append(contentsOf: sizeArray)
+            self.tilesArray.append(contentsOf: sizeArray.filter({ $0.label == "Large Square" }))
             
             DispatchQueue.main.async {
                 self.imageGalleryCollectionView.reloadData()
