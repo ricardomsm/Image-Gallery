@@ -18,8 +18,10 @@ class ImageGalleryViewController: UIViewController {
     //MARK: - Outlets and variables
     @IBOutlet var imageGalleryCollectionView : UICollectionView!
     @IBOutlet var imageSearchBar             : UISearchBar!
+    private var largeImageView               : UIImageView!
     private lazy var sizeArray               = [Size]()
     private lazy var tilesArray              = [Size]()
+    private lazy var largeImageArray         = [Size]()
     private lazy var imageCache              = NSCache<NSString, UIImage>()
     
     //MARK: - Life cycle methods
@@ -28,6 +30,7 @@ class ImageGalleryViewController: UIViewController {
         
         setupSearchBar()
         setupImageGalleryCollectionView()
+        addDismissalTapGesture()
     }
     
     //MARK: - UI setup
@@ -54,6 +57,24 @@ class ImageGalleryViewController: UIViewController {
         imageGalleryCollectionView.delegate = self
         imageGalleryCollectionView.dataSource = self
     }
+    
+    //MARK: - Tap Gesture
+    private func addDismissalTapGesture() {
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func dismissKeyboard() {
+        
+        if imageSearchBar.isFirstResponder {
+            imageSearchBar.resignFirstResponder()
+        } else if largeImageView != nil {
+            largeImageView.removeFromSuperview()
+            largeImageView = nil
+        }
+    }
 
 }
 
@@ -75,6 +96,21 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
         }
     
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+
+        clearLargeImage()
+    
+        if let url = largeImageArray[indexPath.row].source {
+            
+            largeImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height - 40))
+            largeImageView.contentMode = .scaleAspectFit
+            
+            Alert.showLoadingIndicatorAlert(onView: self)
+            
+            showLargeImage(withUrl: url)
+        }
     }
     
     //MARK: Collection view Helper Methods
@@ -114,6 +150,34 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
         }
     }
     
+    private func clearLargeImage() {
+        if largeImageView != nil {
+            largeImageView.removeFromSuperview()
+            largeImageView = nil
+        }
+    }
+    
+    private func showLargeImage(withUrl url: String) {
+        
+        guard let url = URL(string: url) else { print("Couldn't get url"); return }
+        
+        UIImage.downloadImageFromUrl(url) { image in
+            
+            DispatchQueue.main.async {
+                Alert.dismissLoadingIndicator()
+                
+                self.largeImageView.image = image
+                self.largeImageView.image?.draw(at: self.largeImageView.center)
+                
+                UIView.animate(withDuration: 0.4, animations: {
+                    self.largeImageView.backgroundColor = UIColor(red: 211/255, green: 211/255, blue: 211/255, alpha: 0.4)
+                    self.view.addSubview(self.largeImageView)
+                    self.view.bringSubviewToFront(self.largeImageView)
+                })
+            }
+        }
+    }
+    
 }
 
 //MARK: - Search bar delegate methods
@@ -128,6 +192,7 @@ extension ImageGalleryViewController: UISearchBarDelegate {
             
             self.sizeArray.append(contentsOf: sizeArray)
             self.tilesArray.append(contentsOf: sizeArray.filter({ $0.label == "Large Square" }))
+            self.largeImageArray.append(contentsOf: sizeArray.filter({ $0.label == "Large" }))
             
             DispatchQueue.main.async {
                 self.imageGalleryCollectionView.reloadData()
@@ -141,6 +206,7 @@ extension ImageGalleryViewController: UISearchBarDelegate {
     private func cleanGallery() {
         sizeArray.removeAll()
         tilesArray.removeAll()
+        largeImageArray.removeAll()
         imageCache.removeAllObjects()
         imageGalleryCollectionView.reloadData()
     }

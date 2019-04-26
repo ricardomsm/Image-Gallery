@@ -72,8 +72,6 @@ class APIService {
             }
             
         }.resume()
-        
-        UIApplication.shared.isNetworkActivityIndicatorVisible = false
     }
     
     func fetchPhotoImage(withId id: String, success: @escaping (_ sizes: [Size]) -> Void, failure: @escaping (_ error: Error) -> Void) {
@@ -112,6 +110,10 @@ class APIService {
                 let searchSizeResponse = SearchSizeResponse(withDictionary: searchSizeJSON)
                 
                 guard let size = searchSizeResponse.sizes?.size?.filter({ $0.label == "Large Square" || $0.label == "Large" }) else { print("Error getting size array"); return }
+                
+                DispatchQueue.main.async {
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
+                }
                 
                 success(size)
                 
