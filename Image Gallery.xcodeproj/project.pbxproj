@@ -80,13 +80,12 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
-		483ADED0227316EA008FBE17 /* Util */ = {
+		483ADED322733E69008FBE17 /* Util */ = {
 			isa = PBXGroup;
 			children = (
 				483ADED12273170C008FBE17 /* Alert.swift */,
 			);
-			name = Util;
-			path = ..;
+			path = Util;
 			sourceTree = "<group>";
 		};
 		4862CFE02270E41A00C5E2AD = {
@@ -113,7 +112,7 @@
 				4862CFFF2270E46400C5E2AD /* View */,
 				4862D0002270E47900C5E2AD /* Controller */,
 				4862D0042270E53600C5E2AD /* API */,
-				483ADED0227316EA008FBE17 /* Util */,
+				483ADED322733E69008FBE17 /* Util */,
 				4819E9C32272712B00949B2E /* Extensions */,
 				4862D0072270E75200C5E2AD /* Supporting Files */,
 			);
