@@ -12,21 +12,17 @@ import UIKit
 class APIService {
     
     static let shared = APIService()
-    let urlSession    = URLSession.shared
-    
-    private let APIKey                     = "f9cc014fa76b098f9e82f1c288379ea1"
-    private let baseUrl                    = "https://api.flickr.com/services/rest/"
-    private lazy var apiKeyQueryItem       = URLQueryItem(name: "api_key", value: APIKey)
+
+    private var baseUrlComponents          = URLComponents(string: "https://api.flickr.com/services/rest/")
+    private lazy var apiKeyQueryItem       = URLQueryItem(name: "api_key", value: "f9cc014fa76b098f9e82f1c288379ea1")
     private lazy var jsonFormatQueryItem   = URLQueryItem(name: "format", value: "json")
     private lazy var jsonCallbackQueryItem = URLQueryItem(name: "nojsoncallback", value: "1")
     
     func fetchImages(withText text: String?, success: @escaping (_ sizeArray: [Size]) -> Void, failure: @escaping (_ error: Error) -> Void) {
         
-        guard var urlComponents = URLComponents(string: baseUrl) else { print("Error generating url components from string"); return }
-        
         let endpointQueryItem     = URLQueryItem(name: "method", value: "flickr.photos.search")
         let tagsQueryItem         = URLQueryItem(name: "tags", value: text)
-        urlComponents.queryItems = [
+        baseUrlComponents?.queryItems = [
             endpointQueryItem,
             apiKeyQueryItem,
             tagsQueryItem,
@@ -34,11 +30,11 @@ class APIService {
             jsonCallbackQueryItem
         ]
         
-        guard let url = urlComponents.url else { print("Error getting url"); return }
+        guard let url = baseUrlComponents?.url else { print("Error getting url"); return }
         
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
         
-        urlSession.dataTask(with: url) { [weak self] (data, response, error) in
+        URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
             
             let response = response as? HTTPURLResponse
             print("Response status code: \(String(describing: response?.statusCode))")
@@ -76,11 +72,9 @@ class APIService {
     
     func fetchPhotoImage(withId id: String, success: @escaping (_ sizes: [Size]) -> Void, failure: @escaping (_ error: Error) -> Void) {
         
-        guard var urlComponents = URLComponents(string: baseUrl) else { print("Couldn't get url"); return }
-        
         let endpointQueryItem = URLQueryItem(name: "method", value: "flickr.photos.getSizes")
         let photoIdQueryItem = URLQueryItem(name: "photo_id", value: id)
-        urlComponents.queryItems = [
+        baseUrlComponents?.queryItems = [
             endpointQueryItem,
             apiKeyQueryItem,
             photoIdQueryItem,
@@ -88,9 +82,9 @@ class APIService {
             jsonCallbackQueryItem
         ]
         
-        guard let url = urlComponents.url else { print("Couldn't get url from url components"); return }
+        guard let url = baseUrlComponents?.url else { print("Couldn't get url from url components"); return }
         
-        urlSession.dataTask(with: url) { (data, response, error) in
+        URLSession.shared.dataTask(with: url) { (data, response, error) in
             
             let response = response as? HTTPURLResponse
             print("Response status code: \(String(describing: response?.statusCode))")

@@ -68,15 +68,16 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCollectionViewCell
         
-        if let imageURL = tilesArray[indexPath.row].source {
+        if let imageUrl = tilesArray[indexPath.row].source {
             // We use the url as to identify which cell should load which image
-            cell.imageUrl = imageURL
-            setupCell(withUrl: imageURL, image: imageCache.object(forKey: NSString(string: imageURL)), and: cell)
+            cell.imageUrl = imageUrl
+            setupCell(withUrl: imageUrl, image: imageCache.object(forKey: NSString(string: imageUrl)), and: cell)
         }
     
         return cell
     }
     
+    //MARK: Collection view Helper Methods
     private func setupCell(withUrl url: String?, image: UIImage?, and cell: PhotoCollectionViewCell) {
         
         // We use the is hidden property as to hide the cell while there is no image
@@ -88,24 +89,28 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
         } else {
             
             if let imageUrl = url {
-                DispatchQueue.global(qos: .background).async {
-                    
-                    guard let url = URL(string: imageUrl) else { print("Error getting url"); return }
-                    
-                    UIImage.downloadImageFromUrl(url, returns: { image in
-                        
-                        self.imageCache.setObject(image, forKey: NSString(string: imageUrl))
-                        
-                        if cell.imageUrl == imageUrl {
-                            
-                            DispatchQueue.main.async {
-                                cell.imageView.image = image
-                                cell.imageView.isHidden = false
-                            }
-                        }
-                    })
-                }
+                downloadAndSetImage(withUrl: imageUrl, on: cell)
             }
+        }
+    }
+    
+    private func downloadAndSetImage(withUrl imageUrl: String, on cell: PhotoCollectionViewCell) {
+        DispatchQueue.global(qos: .background).async {
+            
+            guard let url = URL(string: imageUrl) else { print("Error getting url"); return }
+            
+            UIImage.downloadImageFromUrl(url, returns: { image in
+                
+                self.imageCache.setObject(image, forKey: NSString(string: imageUrl))
+                
+                if cell.imageUrl == imageUrl {
+                    
+                    DispatchQueue.main.async {
+                        cell.imageView.image = image
+                        cell.imageView.isHidden = false
+                    }
+                }
+            })
         }
     }
     
@@ -134,8 +139,8 @@ extension ImageGalleryViewController: UISearchBarDelegate {
     }
     
     private func cleanGallery() {
-        sizeArray = []
-        tilesArray = []
+        sizeArray.removeAll()
+        tilesArray.removeAll()
         imageCache.removeAllObjects()
         imageGalleryCollectionView.reloadData()
     }
