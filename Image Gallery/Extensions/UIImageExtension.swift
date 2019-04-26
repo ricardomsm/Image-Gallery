@@ -16,13 +16,14 @@ extension UIImage {
             
             if let error = error {
                 print(error)
+                Alert.showGeneralAlert(withMessage: error.localizedDescription)
                 return
             }
             
             guard let data = data else { return }
             
-            let image = UIImage(data: data)
-            returns(image!)
+            guard let image = UIImage(data: data) else { print("Couldn't get image"); return }
+            returns(image)
             
         }.resume()
     }

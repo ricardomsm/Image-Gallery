@@ -42,6 +42,7 @@ class APIService {
             
             if let error = error {
                 print(error)
+                Alert.showGeneralAlert(withMessage: error.localizedDescription)
                 return
             }
             
@@ -54,12 +55,17 @@ class APIService {
                 let searchPhotosResponse = try decoder.decode(SearchPhotosResponse.self, from: data)
                 print(searchPhotosResponse)
                 
-                searchPhotosResponse.photos?.photo?.forEach({ self?.fetchPhotoImage(withId: $0.id!, success: { sizeArray in
-                    success(sizeArray)
-                }, failure: { error in
-                    print(error)
-                    failure(error)
-                }) })
+                searchPhotosResponse.photos?.photo?.forEach({ photo in
+                    
+                    guard let photoId = photo.id else { print("Couldn't get photo id"); return }
+                    
+                    self?.fetchPhotoImage(withId: photoId, success: { sizeArray in
+                        success(sizeArray)
+                    }, failure: { error in
+                        print(error)
+                        failure(error)
+                    })
+                })
                 
             } catch let error {
                 print(error)
@@ -92,6 +98,7 @@ class APIService {
             
             if let error = error {
                 print(error)
+                Alert.showGeneralAlert(withMessage: error.localizedDescription)
                 failure(error)
             }
             
