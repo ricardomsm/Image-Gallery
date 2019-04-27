@@ -140,7 +140,7 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
     //MARK: Collection view Helper Methods
     private func setupCell(withUrl url: String?, image: UIImage?, and cell: PhotoCollectionViewCell) {
         
-        // We use the is hidden property as to hide the cell while there is no image
+        // We use the isHidden property as to hide the cell while there is no image
         cell.imageView.isHidden = true
         
         if image != nil {
@@ -149,8 +149,7 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
         } else {
             
             if let imageUrl = url {
-                
-                imageGalleryViewModel.downloadImage(withUrl: imageUrl, for: cell)
+                imageGalleryViewModel.getImage(withUrl: imageUrl, for: cell)
             }
         }
     }

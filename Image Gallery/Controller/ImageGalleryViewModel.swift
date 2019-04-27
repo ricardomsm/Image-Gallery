@@ -38,7 +38,7 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
         }
     }
     
-    func downloadImage(withUrl imageUrl: String, for cell: PhotoCollectionViewCell) {
+    func getImage(withUrl imageUrl: String, for cell: PhotoCollectionViewCell) {
         
         DispatchQueue.global(qos: .background).async {
             

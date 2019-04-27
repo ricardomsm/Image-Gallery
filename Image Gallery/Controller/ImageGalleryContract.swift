@@ -10,7 +10,7 @@ import UIKit
 
 protocol ImageGalleryViewModelProtocol {
     func fetchImages(withText text: String?)
-    func downloadImage(withUrl imageUrl: String, for cell: PhotoCollectionViewCell)
+    func getImage(withUrl imageUrl: String, for cell: PhotoCollectionViewCell)
     func showLargeImage(forIndexPath indexPath: IndexPath)
     func fetchLargeImageUrlFor(indexPath: IndexPath)
     func displayImage(withUrl url: String)
