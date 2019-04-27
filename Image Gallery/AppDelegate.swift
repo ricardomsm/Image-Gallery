@@ -7,8 +7,10 @@
 //
 
 import UIKit
+import CoreData
 
 @UIApplicationMain
+
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
@@ -41,6 +43,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
+    //MARK: - Core data
+    lazy var persistentContainer: NSPersistentContainer = {
+        
+        let container = NSPersistentContainer(name: "ImageGallery")
+        container.loadPersistentStores(completionHandler: { (description, error) in
+            
+            if let error = error {
+                fatalError("Unable to load persistent stores")
+            }
+        })
+        
+        return container
+    }()
 
 }
 

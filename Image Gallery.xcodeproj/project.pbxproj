@@ -12,6 +12,9 @@
 		4819E9BE2271EE8700949B2E /* Sizes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4819E9BD2271EE8700949B2E /* Sizes.swift */; };
 		4819E9C02271EECC00949B2E /* Size.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4819E9BF2271EECC00949B2E /* Size.swift */; };
 		483ADED22273170C008FBE17 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483ADED12273170C008FBE17 /* Alert.swift */; };
+		483ADED6227358F0008FBE17 /* ImageGallery.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 483ADED4227358F0008FBE17 /* ImageGallery.xcdatamodeld */; };
+		483ADEDF22735EDE008FBE17 /* SizeManagedObject+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483ADEDD22735EDE008FBE17 /* SizeManagedObject+CoreDataClass.swift */; };
+		483ADEE022735EDE008FBE17 /* SizeManagedObject+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483ADEDE22735EDE008FBE17 /* SizeManagedObject+CoreDataProperties.swift */; };
 		4862CFED2270E41A00C5E2AD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4862CFEC2270E41A00C5E2AD /* AppDelegate.swift */; };
 		4862CFF22270E41A00C5E2AD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4862CFF02270E41A00C5E2AD /* Main.storyboard */; };
 		4862CFF42270E41B00C5E2AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4862CFF32270E41B00C5E2AD /* Assets.xcassets */; };
@@ -30,6 +33,9 @@
 		4819E9BD2271EE8700949B2E /* Sizes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sizes.swift; sourceTree = "<group>"; };
 		4819E9BF2271EECC00949B2E /* Size.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Size.swift; sourceTree = "<group>"; };
 		483ADED12273170C008FBE17 /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
+		483ADED5227358F0008FBE17 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		483ADEDD22735EDE008FBE17 /* SizeManagedObject+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SizeManagedObject+CoreDataClass.swift"; sourceTree = "<group>"; };
+		483ADEDE22735EDE008FBE17 /* SizeManagedObject+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SizeManagedObject+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		4862CFE92270E41A00C5E2AD /* Image Gallery.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Image Gallery.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4862CFEC2270E41A00C5E2AD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4862CFF12270E41A00C5E2AD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -88,6 +94,42 @@
 			path = Util;
 			sourceTree = "<group>";
 		};
+		483ADED722735AEC008FBE17 /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				483ADED4227358F0008FBE17 /* ImageGallery.xcdatamodeld */,
+				483ADEE122735EFD008FBE17 /* Models */,
+			);
+			name = Database;
+			sourceTree = "<group>";
+		};
+		483ADED822735B01008FBE17 /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				4862D00B22710B2900C5E2AD /* Photos.swift */,
+				4862D00D2271293100C5E2AD /* Photo.swift */,
+				4819E9BD2271EE8700949B2E /* Sizes.swift */,
+				4819E9BF2271EECC00949B2E /* Size.swift */,
+			);
+			name = Entities;
+			sourceTree = "<group>";
+		};
+		483ADEE122735EFD008FBE17 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				483ADEDD22735EDE008FBE17 /* SizeManagedObject+CoreDataClass.swift */,
+				483ADEDE22735EDE008FBE17 /* SizeManagedObject+CoreDataProperties.swift */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		483ADEE222735F22008FBE17 /* Mappers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Mappers;
+			sourceTree = "<group>";
+		};
 		4862CFE02270E41A00C5E2AD = {
 			isa = PBXGroup;
 			children = (
@@ -122,11 +164,10 @@
 		4862CFFE2270E45E00C5E2AD /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				483ADED722735AEC008FBE17 /* Database */,
 				4819E9C12271EF4700949B2E /* Response Entities */,
-				4862D00B22710B2900C5E2AD /* Photos.swift */,
-				4862D00D2271293100C5E2AD /* Photo.swift */,
-				4819E9BD2271EE8700949B2E /* Sizes.swift */,
-				4819E9BF2271EECC00949B2E /* Size.swift */,
+				483ADED822735B01008FBE17 /* Entities */,
+				483ADEE222735F22008FBE17 /* Mappers */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -239,15 +280,18 @@
 			files = (
 				4862D00E2271293100C5E2AD /* Photo.swift in Sources */,
 				4862D0032270E50900C5E2AD /* ImageGalleryViewController.swift in Sources */,
+				483ADEE022735EDE008FBE17 /* SizeManagedObject+CoreDataProperties.swift in Sources */,
 				4862D0062270E61600C5E2AD /* PhotoCollectionViewCell.swift in Sources */,
 				4819E9BE2271EE8700949B2E /* Sizes.swift in Sources */,
 				48DEAFD4227277F00060273C /* UIImageExtension.swift in Sources */,
+				483ADEDF22735EDE008FBE17 /* SizeManagedObject+CoreDataClass.swift in Sources */,
 				4819E9BC2271EE4500949B2E /* SearchSizeResponse.swift in Sources */,
 				483ADED22273170C008FBE17 /* Alert.swift in Sources */,
 				4862D00A2270EFE600C5E2AD /* APIService.swift in Sources */,
 				4819E9C02271EECC00949B2E /* Size.swift in Sources */,
 				4819E9BA2271C83300949B2E /* SearchPhotosResponse.swift in Sources */,
 				4862D00C22710B2900C5E2AD /* Photos.swift in Sources */,
+				483ADED6227358F0008FBE17 /* ImageGallery.xcdatamodeld in Sources */,
 				4862CFED2270E41A00C5E2AD /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -448,6 +492,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		483ADED4227358F0008FBE17 /* ImageGallery.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				483ADED5227358F0008FBE17 /* Model.xcdatamodel */,
+			);
+			currentVersion = 483ADED5227358F0008FBE17 /* Model.xcdatamodel */;
+			path = ImageGallery.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 4862CFE12270E41A00C5E2AD /* Project object */;
 }
