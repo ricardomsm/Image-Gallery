@@ -41,21 +41,42 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+        self.saveContext()
     }
 
-    //MARK: - Core data
+    // MARK: - Core Data stack
+    
     lazy var persistentContainer: NSPersistentContainer = {
-        
-        let container = NSPersistentContainer(name: "ImageGallery")
-        container.loadPersistentStores(completionHandler: { (description, error) in
-            
-            if let error = error {
-                fatalError("Unable to load persistent stores")
+        /*
+         The persistent container for the application. This implementation
+         creates and returns a container, having loaded the store for the
+         application to it. This property is optional since there are legitimate
+         error conditions that could cause the creation of the store to fail.
+         */
+        let container = NSPersistentContainer(name: "Core_Data_Template")
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                print(error)
+                Alert.showGeneralAlert(withMessage: error.localizedDescription)
             }
         })
-        
         return container
     }()
+    
+    // MARK: - Core Data Saving support
+    
+    func saveContext () {
+        let context = persistentContainer.viewContext
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch {
+                let nserror = error as NSError
+                print(nserror)
+                Alert.showGeneralAlert(withMessage: nserror.localizedDescription)
+            }
+        }
+    }
 
 }
 

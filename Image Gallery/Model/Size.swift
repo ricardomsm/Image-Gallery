@@ -9,6 +9,7 @@
 import Foundation
 
 struct Size {
+    var id     : String?
     var label  : String?
     var width  : String?
     var height : String?
@@ -20,11 +21,16 @@ struct Size {
         
         guard let dictionary = dictionary else { print("Error getting dictionary"); return }
         
+        id     = ""
         label  = dictionary["label"] as? String
         width  = dictionary["width"] as? String
         height = dictionary["height"] as? String
         source = dictionary["source"] as? String
         url    = dictionary["url"] as? String
         media  = dictionary["media"] as? String
+    }
+    
+    mutating func assignId(withId id: String) {
+        self.id = id
     }
 }

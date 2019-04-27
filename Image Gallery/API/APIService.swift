@@ -109,7 +109,16 @@ class APIService {
                 
                 let searchSizeResponse = SearchSizeResponse(withDictionary: searchSizeJSON)
                 
-                guard let size = searchSizeResponse.sizes?.size?.filter({ $0.label == "Large Square" || $0.label == "Large" }) else { print("Error getting size array"); return }
+                guard var size = searchSizeResponse.sizes?.size?.filter({ $0.label == "Large Square" || $0.label == "Large" }) else { print("Error getting size array"); return }
+                
+                /*
+                 Here we go through the array as to assign a photo an id,
+                 as to prevent loading an incorrect photo while clicking another one,
+                 on the view controller
+                */
+                for index in 0...size.count - 1 {
+                    size[index].assignId(withId: id)
+                }
                 
                 DispatchQueue.main.async {
                     UIApplication.shared.isNetworkActivityIndicatorVisible = false

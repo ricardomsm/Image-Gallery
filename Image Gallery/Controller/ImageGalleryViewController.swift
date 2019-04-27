@@ -61,12 +61,12 @@ class ImageGalleryViewController: UIViewController {
     //MARK: - Tap Gesture
     private func addDismissalTapGesture() {
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.dismissViews))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
     }
     
-    @objc private func dismissKeyboard() {
+    @objc private func dismissViews() {
         
         if imageSearchBar.isFirstResponder {
             imageSearchBar.resignFirstResponder()
@@ -101,15 +101,26 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 
         clearLargeImage()
-    
-        if let url = largeImageArray[indexPath.row].source {
-            
-            largeImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height - 40))
-            largeImageView.contentMode = .scaleAspectFit
+        
+        /*
+         Here we check if the user has scrolled down fast enough,
+         that didn't allow time for the fetching all the large images,
+         so we fetch them on the go
+        */
+        if indexPath.row >= largeImageArray.count || tilesArray[indexPath.row].id != largeImageArray[indexPath.row].id {
             
             Alert.showLoadingIndicatorAlert(onView: self)
+            fetchAndDisplayLargeImage(withIndexPath: indexPath)
+        } else {
             
-            showLargeImage(withUrl: url)
+            let largeImage = largeImageArray.filter({ $0.id == tilesArray[indexPath.row].id }).first
+            
+            if let url = largeImage?.source {
+                
+                Alert.showLoadingIndicatorAlert(onView: self)
+                showLargeImage(withUrl: url)
+            }
+
         }
     }
     
@@ -159,6 +170,11 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
     
     private func showLargeImage(withUrl url: String) {
         
+        DispatchQueue.main.async {
+            self.largeImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
+            self.largeImageView.contentMode = .scaleAspectFit
+        }
+
         guard let url = URL(string: url) else { print("Couldn't get url"); return }
         
         UIImage.downloadImageFromUrl(url) { image in
@@ -175,6 +191,27 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
                     self.view.bringSubviewToFront(self.largeImageView)
                 })
             }
+        }
+    }
+    
+    private func fetchAndDisplayLargeImage(withIndexPath indexPath: IndexPath) {
+        
+        guard let id = tilesArray[indexPath.row].id else { print("Couldn't get id"); return }
+        
+        APIService.shared.fetchPhotoImage(withId: id, success: { (size) in
+        
+            if let largeImage = size.filter({ $0.label == "Large" }).first {
+                
+                self.largeImageArray.append(largeImage)
+                
+                if let largeImageUrl = largeImage.source {
+                    self.showLargeImage(withUrl: largeImageUrl)
+                }
+            } else {
+                Alert.showGeneralAlert(withMessage: "Couldn't get larger image for selected image. Please search again.")
+            }
+        }) { (error) in
+            Alert.showGeneralAlert(withMessage: error.localizedDescription)
         }
     }
     
