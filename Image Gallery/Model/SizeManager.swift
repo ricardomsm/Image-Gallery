@@ -14,21 +14,21 @@ class SizeManager {
     static let shared = SizeManager()
     private let appDelegate = UIApplication.shared.delegate as? AppDelegate
     
-    func saveImages(fromArray sizeArray: [Size]) {
+    func saveSize(_ size: Size, andImage image: NSData) {
         
         let container = appDelegate?.persistentContainer
-        let context = container?.viewContext
+        let context   = container?.viewContext
+        let entity    = SizeManagedObject(context: context!)
         
-        for size in sizeArray {
-            let entity = SizeManagedObject(context: context!)
-            entity.id     = size.id
-            entity.label  = size.label
-            entity.width  = size.width
-            entity.height = size.width
-            entity.source = size.source
-            entity.url    = size.url
-            entity.media  = size.media
-            entity.image  = size.image
-        }
+        entity.id     = size.id
+        entity.label  = size.label
+        entity.width  = size.width
+        entity.height = size.width
+        entity.source = size.source
+        entity.url    = size.url
+        entity.media  = size.media
+        entity.image  = image
+        
+        appDelegate?.saveContext()
     }
 }

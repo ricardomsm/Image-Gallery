@@ -156,4 +156,12 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
             }
         }
     }
+    
+//    func saveImage() {
+//        for index in 0 ... imageGalleryViewModel.tilesArray.count - 1 {
+//            let cell = imageGalleryCollectionView.cellForItem(at: IndexPath(row: index, section: 0)) as? PhotoCollectionViewCell
+//            let imageData = cell?.imageView.image?.pngData() as NSData?
+//            SizeManager.shared.saveSize(imageGalleryViewModel.tilesArray[index], andImage: imageData!)
+//        }
+//    }
 }

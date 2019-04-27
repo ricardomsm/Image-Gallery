@@ -103,7 +103,6 @@ class ImageGalleryViewController: UIViewController, ImageGalleryViewControllerPr
             largeImageView = nil
         }
     }
-
 }
 
 //MARK: - Collection View delegate and datasource
