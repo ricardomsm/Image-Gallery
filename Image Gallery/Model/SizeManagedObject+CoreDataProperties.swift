@@ -18,12 +18,12 @@ extension SizeManagedObject {
     }
 
     @NSManaged public var height: String?
-    @NSManaged public var image_path: String?
     @NSManaged public var label: String?
     @NSManaged public var media: String?
     @NSManaged public var source: String?
     @NSManaged public var url: String?
     @NSManaged public var width: String?
     @NSManaged public var id: String?
+    @NSManaged public var image: NSData?
 
 }

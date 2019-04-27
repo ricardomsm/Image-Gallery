@@ -16,6 +16,7 @@ struct Size {
     var source : String?
     var url    : String?
     var media  : String?
+    var image  : NSData?
     
     init(withDictionary dictionary: [String : Any]?) {
         
