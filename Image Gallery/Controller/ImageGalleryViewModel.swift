@@ -17,6 +17,8 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
     lazy var tilesArray      = [Size]()
     lazy var largeImageArray = [Size]()
     lazy var imageCache      = NSCache<NSString, UIImage>()
+    lazy var currentPage     = 1
+    lazy var totalPages      = 0
     
     init(withView view: ImageGalleryViewController) {
         self.view = view
@@ -25,7 +27,9 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
     //MARK: - View Model Methods
     func fetchImages(withText text: String?) {
         
-        APIService.shared.fetchImages(withText: text, success: { sizeArray in
+        APIService.shared.fetchImages(withText: text, page: nil, success: { sizeArray, totalPages in
+            
+            self.totalPages = totalPages
             
             self.sizeArray.append(contentsOf: sizeArray)
             self.tilesArray.append(contentsOf: sizeArray.filter({ $0.label == "Large Square" }))
@@ -46,10 +50,15 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
             
             UIImage.downloadImageFromUrl(url, returns: { image in
                 
-                self.imageCache.setObject(image, forKey: NSString(string: imageUrl))
-
-                if cell.imageUrl == imageUrl {
-                    self.view?.setImageOnCell(cell, withImage: image)
+                if let image = image {
+                    
+                    self.imageCache.setObject(image, forKey: NSString(string: imageUrl))
+                    
+                    if cell.imageUrl == imageUrl {
+                        self.view?.setImageOnCell(cell, withImage: image)
+                    }
+                } else {
+                    self.getImage(withUrl: imageUrl, for: cell)
                 }
             })
         }
@@ -108,9 +117,18 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
         
         UIImage.downloadImageFromUrl(url) { image in
             
-            DispatchQueue.main.async {
-                Alert.dismissLoadingIndicator()
-                self.view?.setLargeImage(withImage: image)
+            if image == nil {
+                DispatchQueue.main.async() {
+                    Alert.dismissLoadingIndicator()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                        Alert.showGeneralAlert(withMessage: "Couldn't get image")
+                    })
+                }
+            } else {
+                DispatchQueue.main.async {
+                    Alert.dismissLoadingIndicator()
+                    self.view?.setLargeImage(withImage: image!)
+                }
             }
         }
     }

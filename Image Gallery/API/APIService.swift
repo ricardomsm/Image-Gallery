@@ -18,10 +18,12 @@ class APIService {
     private lazy var jsonFormatQueryItem   = URLQueryItem(name: "format", value: "json")
     private lazy var jsonCallbackQueryItem = URLQueryItem(name: "nojsoncallback", value: "1")
     
-    func fetchImages(withText text: String?, success: @escaping (_ sizeArray: [Size]) -> Void, failure: @escaping (_ error: Error) -> Void) {
+    func fetchImages(withText text: String?, page: Int?, success: @escaping (_ sizeArray: [Size], _ totalPages: Int) -> Void, failure: @escaping (_ error: Error) -> Void) {
         
         let endpointQueryItem     = URLQueryItem(name: "method", value: "flickr.photos.search")
         let tagsQueryItem         = URLQueryItem(name: "tags", value: text)
+        var pageQueryItem         : URLQueryItem?
+        
         baseUrlComponents?.queryItems = [
             endpointQueryItem,
             apiKeyQueryItem,
@@ -30,6 +32,11 @@ class APIService {
             jsonCallbackQueryItem
         ]
         
+        if page != nil {
+            pageQueryItem = URLQueryItem(name: "page", value: String(page!))
+            baseUrlComponents?.queryItems?.insert(pageQueryItem!, at: 3)
+        }
+
         guard let url = baseUrlComponents?.url else { print("Error getting url"); return }
         
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
@@ -55,12 +62,14 @@ class APIService {
                 let searchPhotosResponse = try decoder.decode(SearchPhotosResponse.self, from: data)
                 print(searchPhotosResponse)
                 
+                guard let totalPages = searchPhotosResponse.photos?.pages else { print("Couldn't get total number of pages"); return }
+                
                 searchPhotosResponse.photos?.photo?.forEach({ photo in
                     
                     guard let photoId = photo.id else { print("Couldn't get photo id"); return }
                     
                     self?.fetchPhotoImage(withId: photoId, success: { sizeArray in
-                        success(sizeArray)
+                        success(sizeArray, totalPages)
                     }, failure: { error in
                         print(error)
                         failure(error)

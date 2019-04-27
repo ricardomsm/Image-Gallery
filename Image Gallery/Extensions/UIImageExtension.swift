@@ -10,7 +10,7 @@ import UIKit
 
 extension UIImage {
     
-    static func downloadImageFromUrl(_ url: URL, returns: @escaping (_ image: UIImage) -> Void) {
+    static func downloadImageFromUrl(_ url: URL, returns: @escaping (_ image: UIImage?) -> Void) {
 
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             
@@ -22,8 +22,11 @@ extension UIImage {
             
             guard let data = data else { return }
             
-            guard let image = UIImage(data: data) else { print("Couldn't get image"); return }
-            returns(image)
+            if let image = UIImage(data: data) {
+                returns(image)
+            } else {
+                returns(nil)
+            }
             
         }.resume()
     }
