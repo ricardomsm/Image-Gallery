@@ -13,16 +13,14 @@ struct ImageGalleryDimensions {
     fileprivate static let imageHeight: CGFloat = 150
 }
 
-class ImageGalleryViewController: UIViewController {
-
+class ImageGalleryViewController: UIViewController, ImageGalleryViewControllerProtocol {
+    
     //MARK: - Outlets and variables
     @IBOutlet var imageGalleryCollectionView : UICollectionView!
     @IBOutlet var imageSearchBar             : UISearchBar!
     private var largeImageView               : UIImageView!
-    private lazy var sizeArray               = [Size]()
-    private lazy var tilesArray              = [Size]()
-    private lazy var largeImageArray         = [Size]()
-    private lazy var imageCache              = NSCache<NSString, UIImage>()
+    private lazy var imageGalleryViewModel   = ImageGalleryViewModel(withView: self)
+
     
     //MARK: - Life cycle methods
     override func viewDidLoad() {
@@ -31,6 +29,36 @@ class ImageGalleryViewController: UIViewController {
         setupSearchBar()
         setupImageGalleryCollectionView()
         addDismissalTapGesture()
+    }
+    
+    //MARK: - View Model Methods
+    func setImages() {
+        DispatchQueue.main.async {
+            self.imageGalleryCollectionView.reloadData()
+        }
+    }
+    
+    func setImageOnCell(_ cell: PhotoCollectionViewCell, withImage image: UIImage) {
+        
+        DispatchQueue.main.async {
+            cell.imageView.image = image
+            cell.imageView.isHidden = false
+        }
+    }
+    
+    func setLargeImage(withImage image: UIImage) {
+        
+        self.largeImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
+        self.largeImageView.contentMode = .scaleAspectFit
+        
+        self.largeImageView.image = image
+        self.largeImageView.image?.draw(at: self.largeImageView.center)
+        
+        UIView.animate(withDuration: 0.4, animations: {
+            self.largeImageView.backgroundColor = UIColor(red: 211/255, green: 211/255, blue: 211/255, alpha: 0.4)
+            self.view.addSubview(self.largeImageView)
+            self.view.bringSubviewToFront(self.largeImageView)
+        })
     }
     
     //MARK: - UI setup
@@ -56,6 +84,7 @@ class ImageGalleryViewController: UIViewController {
         imageGalleryCollectionView.collectionViewLayout = galleryLayout
         imageGalleryCollectionView.delegate = self
         imageGalleryCollectionView.dataSource = self
+        imageGalleryCollectionView.prefetchDataSource = self
     }
     
     //MARK: - Tap Gesture
@@ -79,20 +108,20 @@ class ImageGalleryViewController: UIViewController {
 }
 
 //MARK: - Collection View delegate and datasource
-extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    
+extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDataSourcePrefetching {
+
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return tilesArray.count
+        return imageGalleryViewModel.tilesArray.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCollectionViewCell
         
-        if let imageUrl = tilesArray[indexPath.row].source {
+        if let imageUrl = imageGalleryViewModel.tilesArray[indexPath.row].source {
             // We use the url as to identify which cell should load which image
             cell.imageUrl = imageUrl
-            setupCell(withUrl: imageUrl, image: imageCache.object(forKey: NSString(string: imageUrl)), and: cell)
+            setupCell(withUrl: imageUrl, image: imageGalleryViewModel.imageCache.object(forKey: NSString(string: imageUrl)), and: cell)
         }
     
         return cell
@@ -101,27 +130,11 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 
         clearLargeImage()
+        imageGalleryViewModel.showLargeImage(forIndexPath: indexPath)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         
-        /*
-         Here we check if the user has scrolled down fast enough,
-         that didn't allow time for the fetching all the large images,
-         so we fetch them on the go
-        */
-        if indexPath.row >= largeImageArray.count || tilesArray[indexPath.row].id != largeImageArray[indexPath.row].id {
-            
-            Alert.showLoadingIndicatorAlert(onView: self)
-            fetchAndDisplayLargeImage(withIndexPath: indexPath)
-        } else {
-            
-            let largeImage = largeImageArray.filter({ $0.id == tilesArray[indexPath.row].id }).first
-            
-            if let url = largeImage?.source {
-                
-                Alert.showLoadingIndicatorAlert(onView: self)
-                showLargeImage(withUrl: url)
-            }
-
-        }
     }
     
     //MARK: Collection view Helper Methods
@@ -136,28 +149,9 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
         } else {
             
             if let imageUrl = url {
-                downloadAndSetImage(withUrl: imageUrl, on: cell)
+                
+                imageGalleryViewModel.downloadImage(withUrl: imageUrl, for: cell)
             }
-        }
-    }
-    
-    private func downloadAndSetImage(withUrl imageUrl: String, on cell: PhotoCollectionViewCell) {
-        DispatchQueue.global(qos: .background).async {
-            
-            guard let url = URL(string: imageUrl) else { print("Error getting url"); return }
-            
-            UIImage.downloadImageFromUrl(url, returns: { image in
-                
-                self.imageCache.setObject(image, forKey: NSString(string: imageUrl))
-                
-                if cell.imageUrl == imageUrl {
-                    
-                    DispatchQueue.main.async {
-                        cell.imageView.image = image
-                        cell.imageView.isHidden = false
-                    }
-                }
-            })
         }
     }
     
@@ -167,54 +161,6 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
             largeImageView = nil
         }
     }
-    
-    private func showLargeImage(withUrl url: String) {
-        
-        DispatchQueue.main.async {
-            self.largeImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
-            self.largeImageView.contentMode = .scaleAspectFit
-        }
-
-        guard let url = URL(string: url) else { print("Couldn't get url"); return }
-        
-        UIImage.downloadImageFromUrl(url) { image in
-            
-            DispatchQueue.main.async {
-                Alert.dismissLoadingIndicator()
-                
-                self.largeImageView.image = image
-                self.largeImageView.image?.draw(at: self.largeImageView.center)
-                
-                UIView.animate(withDuration: 0.4, animations: {
-                    self.largeImageView.backgroundColor = UIColor(red: 211/255, green: 211/255, blue: 211/255, alpha: 0.4)
-                    self.view.addSubview(self.largeImageView)
-                    self.view.bringSubviewToFront(self.largeImageView)
-                })
-            }
-        }
-    }
-    
-    private func fetchAndDisplayLargeImage(withIndexPath indexPath: IndexPath) {
-        
-        guard let id = tilesArray[indexPath.row].id else { print("Couldn't get id"); return }
-        
-        APIService.shared.fetchPhotoImage(withId: id, success: { (size) in
-        
-            if let largeImage = size.filter({ $0.label == "Large" }).first {
-                
-                self.largeImageArray.append(largeImage)
-                
-                if let largeImageUrl = largeImage.source {
-                    self.showLargeImage(withUrl: largeImageUrl)
-                }
-            } else {
-                Alert.showGeneralAlert(withMessage: "Couldn't get larger image for selected image. Please search again.")
-            }
-        }) { (error) in
-            Alert.showGeneralAlert(withMessage: error.localizedDescription)
-        }
-    }
-    
 }
 
 //MARK: - Search bar delegate methods
@@ -225,26 +171,14 @@ extension ImageGalleryViewController: UISearchBarDelegate {
         view.endEditing(true)
         cleanGallery()
         
-        APIService.shared.fetchImages(withText: searchBar.text, success: { sizeArray in
-            
-            self.sizeArray.append(contentsOf: sizeArray)
-            self.tilesArray.append(contentsOf: sizeArray.filter({ $0.label == "Large Square" }))
-            self.largeImageArray.append(contentsOf: sizeArray.filter({ $0.label == "Large" }))
-            
-            DispatchQueue.main.async {
-                self.imageGalleryCollectionView.reloadData()
-            }
-            
-        }) { error in
-            print(error)
-        }
+        imageGalleryViewModel.fetchImages(withText: searchBar.text!)
     }
     
     private func cleanGallery() {
-        sizeArray.removeAll()
-        tilesArray.removeAll()
-        largeImageArray.removeAll()
-        imageCache.removeAllObjects()
+        imageGalleryViewModel.sizeArray.removeAll()
+        imageGalleryViewModel.tilesArray.removeAll()
+        imageGalleryViewModel.largeImageArray.removeAll()
+        imageGalleryViewModel.imageCache.removeAllObjects()
         imageGalleryCollectionView.reloadData()
     }
 }
