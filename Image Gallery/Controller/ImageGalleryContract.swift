@@ -14,6 +14,7 @@ protocol ImageGalleryViewModelProtocol {
     func showLargeImage(forIndexPath indexPath: IndexPath)
     func fetchLargeImageUrlFor(indexPath: IndexPath)
     func displayImage(withUrl url: String)
+    func beginBatchFetch()
 }
 
 protocol ImageGalleryViewControllerProtocol {

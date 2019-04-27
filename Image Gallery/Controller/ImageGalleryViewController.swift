@@ -84,7 +84,6 @@ class ImageGalleryViewController: UIViewController, ImageGalleryViewControllerPr
         imageGalleryCollectionView.collectionViewLayout = galleryLayout
         imageGalleryCollectionView.delegate = self
         imageGalleryCollectionView.dataSource = self
-        imageGalleryCollectionView.prefetchDataSource = self
     }
     
     //MARK: - Tap Gesture
@@ -108,7 +107,7 @@ class ImageGalleryViewController: UIViewController, ImageGalleryViewControllerPr
 }
 
 //MARK: - Collection View delegate and datasource
-extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDataSourcePrefetching {
+extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return imageGalleryViewModel.tilesArray.count
@@ -132,11 +131,21 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
         clearLargeImage()
         imageGalleryViewModel.showLargeImage(forIndexPath: indexPath)
     }
-    
-    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
+        let offSetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        
+        if offSetY > contentHeight - scrollView.frame.height {
+            
+            if !imageGalleryViewModel.isFetchingMore {
+                Alert.showLoadingIndicatorAlert(onView: self)
+                imageGalleryViewModel.beginBatchFetch()
+            }
+        }
     }
-    
+
     //MARK: Collection view Helper Methods
     private func setupCell(withUrl url: String?, image: UIImage?, and cell: PhotoCollectionViewCell) {
         

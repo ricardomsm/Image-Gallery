@@ -19,6 +19,8 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
     lazy var imageCache      = NSCache<NSString, UIImage>()
     lazy var currentPage     = 1
     lazy var totalPages      = 0
+    var isFetchingMore       = false
+    var lastUserEnteredText  = ""
     
     init(withView view: ImageGalleryViewController) {
         self.view = view
@@ -27,19 +29,41 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
     //MARK: - View Model Methods
     func fetchImages(withText text: String?) {
         
-        APIService.shared.fetchImages(withText: text, page: nil, success: { sizeArray, totalPages in
+        if let text = text {
+            lastUserEnteredText = text
+        }
+        
+        if isFetchingMore && currentPage <= totalPages {
+            currentPage += 1
+        } else {
+            currentPage = 1
+        }
+        
+        APIService.shared.fetchImages(withText: text, page: currentPage, success: { sizeArray, totalPages in
             
             self.totalPages = totalPages
-            
+
             self.sizeArray.append(contentsOf: sizeArray)
             self.tilesArray.append(contentsOf: sizeArray.filter({ $0.label == "Large Square" }))
             self.largeImageArray.append(contentsOf: sizeArray.filter({ $0.label == "Large" }))
             
             self.view?.setImages()
             
+            if self.isFetchingMore {
+                self.isFetchingMore = false
+                DispatchQueue.main.async {
+                    Alert.dismissLoadingIndicator()
+                }
+            }
+            
         }) { error in
             print(error)
         }
+    }
+    
+    func beginBatchFetch() {
+        isFetchingMore = true
+        fetchImages(withText: lastUserEnteredText)
     }
     
     func getImage(withUrl imageUrl: String, for cell: PhotoCollectionViewCell) {
