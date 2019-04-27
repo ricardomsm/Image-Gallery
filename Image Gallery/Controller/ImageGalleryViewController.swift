@@ -8,7 +8,7 @@
 
 import UIKit
 
-struct ImageGalleryDimensions {
+fileprivate struct ImageGalleryDimensions {
     fileprivate static let trailingAndLeadingMargin: CGFloat = 15
     fileprivate static let imageHeight: CGFloat = 150
 }

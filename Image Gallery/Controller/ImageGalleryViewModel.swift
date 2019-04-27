@@ -118,7 +118,7 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
         
         guard let id = self.tilesArray[indexPath.row].id else { print("Couldn't get id"); return }
         
-        APIService.shared.fetchPhotoImage(withId: id, success: { (size) in
+        APIService.shared.fetchPhotoImage(withId: id, success: { size in
             
             if let largeImage = size.filter({ $0.label == "Large" }).first {
                 
