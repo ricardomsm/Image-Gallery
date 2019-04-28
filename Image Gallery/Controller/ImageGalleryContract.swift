@@ -15,7 +15,7 @@ protocol ImageGalleryViewModelProtocol {
     func fetchLargeImageUrlFor(indexPath: IndexPath)
     func displayImage(withUrl url: String)
     func beginBatchFetch()
-    func saveTileImage(from cell: PhotoCollectionViewCell)
+    func saveTileImage(withUrl imageUrl: String, and image: UIImage)
     func saveLargeImage(withUrl url: String, andImage image: UIImage)
     func fetchStoredImages()
 }

@@ -86,12 +86,12 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
                 if let image = image {
                     
                     self.imageCache.setObject(image, forKey: NSString(string: imageUrl))
+                    self.saveTileImage(withUrl: imageUrl, and: image)
                     
                     if cell.imageUrl == imageUrl {
                         
                         DispatchQueue.main.async {
                             self.view?.setImageOnCell(cell, withImage: image)
-                            self.saveTileImage(from: cell)
                         }
                     }
                 } else {
@@ -178,13 +178,13 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
     }
     
     //MARK: Persistence methods
-    func saveTileImage(from cell: PhotoCollectionViewCell) {
+    func saveTileImage(withUrl imageUrl: String, and image: UIImage) {
         
         for index in 0 ... tilesArray.count - 1 {
             
-            if tilesArray[index].source == cell.imageUrl {
+            if tilesArray[index].source == imageUrl {
                 
-                guard let imageData = cell.imageView.image?.pngData() as NSData? else { print("Couldn't get image data"); return }
+                guard let imageData = image.pngData() as NSData? else { print("Couldn't get image data"); return }
                 SizeManager.shared.saveSize(self.tilesArray[index], andImage: imageData)
             }
         }
@@ -216,7 +216,7 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
                     let size = SizeMapper().size(fromManagedObject: result as! SizeManagedObject)
                     
                     sizeArray.append(size)
-                    tilesArray.append(contentsOf: sizeArray.filter({ $0.label == "Large Square" }))
+                    tilesArray.append(contentsOf: sizeArray.filter({ $0.label == "Large Square" && $0.id != size.id }))
                     largeImageArray.append(contentsOf: sizeArray.filter({ $0.label == "Large" }))
                     
                     view?.setImages()

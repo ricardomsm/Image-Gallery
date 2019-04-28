@@ -17,9 +17,8 @@ class SizeManager {
     
     func saveSize(_ size: Size, andImage image: NSData) {
         
-        let container = appDelegate?.persistentContainer
-        guard let context   = container?.viewContext else { print("Error getting context"); return }
-        let entity    = SizeManagedObject(context: context)
+        guard let context = context else { print("Error getting context"); return }
+        let entity        = SizeManagedObject(entity: SizeManagedObject.entity(), insertInto: context)
         
         entity.id     = size.id
         entity.label  = size.label
@@ -39,7 +38,14 @@ class SizeManager {
         fetchRequest.returnsObjectsAsFaults = false
         
         do {
+            
             guard let results = try context?.fetch(fetchRequest) else { print("Error getting results"); return }
+            
+            print("Fetch Results: \(results.count)")
+            if results.count == 0 {
+                return
+            }
+            
             for object in results {
                 guard let objectData = object as? NSManagedObject else {continue}
                 context?.delete(objectData)

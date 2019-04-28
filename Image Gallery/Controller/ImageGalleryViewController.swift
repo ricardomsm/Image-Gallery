@@ -163,6 +163,10 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
+        if !hasInternetConnection {
+            return
+        }
+        
         /*
          Here we check if the user is scrolling downwards, and when he reach the bottom,
          we begin a new fetch for images.
