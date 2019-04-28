@@ -48,7 +48,9 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
             self.tilesArray.append(contentsOf: sizeArray.filter({ $0.label == "Large Square" }))
             self.largeImageArray.append(contentsOf: sizeArray.filter({ $0.label == "Large" }))
             
-            self.view?.setImages()
+            DispatchQueue.main.async {
+                self.view?.setImages()
+            }
             
             if self.isFetchingMore {
                 
@@ -86,8 +88,11 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
                     self.imageCache.setObject(image, forKey: NSString(string: imageUrl))
                     
                     if cell.imageUrl == imageUrl {
-                        self.view?.setImageOnCell(cell, withImage: image)
-                        self.saveTileImage(from: cell)
+                        
+                        DispatchQueue.main.async {
+                            self.view?.setImageOnCell(cell, withImage: image)
+                            self.saveTileImage(from: cell)
+                        }
                     }
                 } else {
                     self.getImage(withUrl: imageUrl, for: cell)
@@ -150,15 +155,21 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
         UIImage.downloadImageFromUrl(url) { image in
             
             if image == nil {
+                
                 DispatchQueue.main.async() {
+                    
                     Alert.dismissLoadingIndicator()
+                    
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                         Alert.showGeneralAlert(withMessage: "Couldn't get image")
                     })
                 }
             } else {
+                
                 DispatchQueue.main.async {
+                    
                     Alert.dismissLoadingIndicator()
+                    
                     self.view?.setLargeImage(withImage: image!)
                     self.saveLargeImage(withUrl: imageUrl, andImage: image!)
                 }
@@ -172,10 +183,9 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
         for index in 0 ... tilesArray.count - 1 {
             
             if tilesArray[index].source == cell.imageUrl {
-                DispatchQueue.main.async {
-                    guard let imageData = cell.imageView.image?.pngData() as NSData? else { print("Couldn't get image data"); return }
-                    SizeManager.shared.saveSize(self.tilesArray[index], andImage: imageData)
-                }
+                
+                guard let imageData = cell.imageView.image?.pngData() as NSData? else { print("Couldn't get image data"); return }
+                SizeManager.shared.saveSize(self.tilesArray[index], andImage: imageData)
             }
         }
     }

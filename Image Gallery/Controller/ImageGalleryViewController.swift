@@ -39,17 +39,12 @@ class ImageGalleryViewController: UIViewController, ImageGalleryViewControllerPr
     
     //MARK: - View Model Methods
     func setImages() {
-        DispatchQueue.main.async {
-            self.imageGalleryCollectionView.reloadData()
-        }
+        self.imageGalleryCollectionView.reloadData()
     }
     
     func setImageOnCell(_ cell: PhotoCollectionViewCell, withImage image: UIImage) {
-        
-        DispatchQueue.main.async {
-            cell.imageView.image = image
-            cell.imageView.isHidden = false
-        }
+        cell.imageView.image = image
+        cell.imageView.isHidden = false
     }
     
     func setLargeImage(withImage image: UIImage) {
