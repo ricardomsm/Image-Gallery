@@ -29,6 +29,7 @@ class ImageGalleryViewController: UIViewController, ImageGalleryViewControllerPr
         setupSearchBar()
         setupImageGalleryCollectionView()
         addDismissalTapGesture()
+        imageGalleryViewModel.fetchStoredImages()
     }
     
     //MARK: - View Model Methods
@@ -133,6 +134,10 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
+        /*
+         Here we check if the user is scrolling downwards, and when he reach the bottom,
+         we begin a new fetch for images.
+        */
         let offSetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         

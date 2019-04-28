@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
     
@@ -80,6 +81,7 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
                     
                     if cell.imageUrl == imageUrl {
                         self.view?.setImageOnCell(cell, withImage: image)
+                        self.saveTileImage(from: cell)
                     }
                 } else {
                     self.getImage(withUrl: imageUrl, for: cell)
@@ -135,9 +137,9 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
         }
     }
     
-    func displayImage(withUrl url: String) {
+    func displayImage(withUrl imageUrl: String) {
         
-        guard let url = URL(string: url) else { print("Couldn't get url"); return }
+        guard let url = URL(string: imageUrl) else { print("Couldn't get url"); return }
         
         UIImage.downloadImageFromUrl(url) { image in
             
@@ -152,16 +154,57 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
                 DispatchQueue.main.async {
                     Alert.dismissLoadingIndicator()
                     self.view?.setLargeImage(withImage: image!)
+                    self.saveLargeImage(withUrl: imageUrl, andImage: image!)
                 }
             }
         }
     }
     
-//    func saveImage() {
-//        for index in 0 ... imageGalleryViewModel.tilesArray.count - 1 {
-//            let cell = imageGalleryCollectionView.cellForItem(at: IndexPath(row: index, section: 0)) as? PhotoCollectionViewCell
-//            let imageData = cell?.imageView.image?.pngData() as NSData?
-//            SizeManager.shared.saveSize(imageGalleryViewModel.tilesArray[index], andImage: imageData!)
-//        }
-//    }
+    func saveTileImage(from cell: PhotoCollectionViewCell) {
+        
+        for index in 0 ... tilesArray.count - 1 {
+            
+            if tilesArray[index].source == cell.imageUrl {
+                DispatchQueue.main.async {
+                    guard let imageData = cell.imageView.image?.pngData() as NSData? else { print("Couldn't get image data"); return }
+                    SizeManager.shared.saveSize(self.tilesArray[index], andImage: imageData)
+                }
+            }
+        }
+    }
+    
+    func saveLargeImage(withUrl url: String, andImage image: UIImage) {
+        
+        for index in 0 ... largeImageArray.count - 1 {
+            
+            if largeImageArray[index].source == url {
+                
+                guard let imageData = image.pngData() as NSData? else { print("Couldn't get image data"); return }
+    
+                SizeManager.shared.saveSize(largeImageArray[index], andImage: imageData)
+            }
+        }
+    }
+    
+    func fetchStoredImages() {
+        
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "SizeManagedObject")
+        
+        do {
+            
+            if let results = try SizeManager.shared.context?.fetch(fetchRequest) as? [NSManagedObject] {
+                
+                for result in results {
+                    let size = SizeMapper().size(fromManagedObject: result as! SizeManagedObject)
+                    sizeArray.append(size)
+                    print(sizeArray)
+                }
+            }
+            
+        } catch let error {
+            print("Fetch error: \(error)")
+        }
+        
+        
+    }
 }

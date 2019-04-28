@@ -12,13 +12,14 @@ import CoreData
 class SizeManager {
     
     static let shared = SizeManager()
-    private let appDelegate = UIApplication.shared.delegate as? AppDelegate
+    let appDelegate   = UIApplication.shared.delegate as? AppDelegate
+    let context       = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext
     
     func saveSize(_ size: Size, andImage image: NSData) {
         
         let container = appDelegate?.persistentContainer
-        let context   = container?.viewContext
-        let entity    = SizeManagedObject(context: context!)
+        guard let context   = container?.viewContext else { print("Error getting context"); return }
+        let entity    = SizeManagedObject(context: context)
         
         entity.id     = size.id
         entity.label  = size.label
