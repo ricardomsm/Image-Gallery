@@ -8,20 +8,22 @@
 
 import UIKit
 import CoreData
+import Reachability
 
 class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
     
     //MARK: - Variables and constructor
     var view                 : ImageGalleryViewControllerProtocol?
     
-    lazy var sizeArray       = [Size]()
-    lazy var tilesArray      = [Size]()
-    lazy var largeImageArray = [Size]()
-    lazy var imageCache      = NSCache<NSString, UIImage>()
-    lazy var currentPage     = 1
-    lazy var totalPages      = 0
-    var isFetchingMore       = false
-    var lastUserEnteredText  = ""
+    lazy var sizeArray        = [Size]()
+    lazy var tilesArray       = [Size]()
+    lazy var largeImageArray  = [Size]()
+    lazy var imageCache       = NSCache<NSString, UIImage>()
+    lazy var currentPage      = 1
+    lazy var totalPages       = 0
+    var isFetchingMore        = false
+    var lastUserEnteredText   = ""
+    let hasInternetConnection = false
     
     init(withView view: ImageGalleryViewController) {
         self.view = view
@@ -59,12 +61,7 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
                 DispatchQueue.main.async {
                     Alert.dismissLoadingIndicator()
                 }
-            } else {
-                DispatchQueue.main.async {
-                    SizeManager.shared.deleteAll("SizeManagedObject")
-                }
-            }
-            
+            }             
         }) { error in
             print(error)
         }
@@ -86,12 +83,16 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
                 if let image = image {
                     
                     self.imageCache.setObject(image, forKey: NSString(string: imageUrl))
-                    self.saveTileImage(withUrl: imageUrl, and: image)
                     
                     if cell.imageUrl == imageUrl {
                         
                         DispatchQueue.main.async {
+                            
                             self.view?.setImageOnCell(cell, withImage: image)
+                            
+                            if self.hasInternetConnection {
+                                self.saveTileImage(withUrl: imageUrl, and: image)
+                            }
                         }
                     }
                 } else {
@@ -171,7 +172,10 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
                     Alert.dismissLoadingIndicator()
                     
                     self.view?.setLargeImage(withImage: image!)
-                    self.saveLargeImage(withUrl: imageUrl, andImage: image!)
+                    
+                    if self.hasInternetConnection {
+                        self.saveLargeImage(withUrl: imageUrl, andImage: image!)
+                    }
                 }
             }
         }
@@ -180,27 +184,18 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
     //MARK: Persistence methods
     func saveTileImage(withUrl imageUrl: String, and image: UIImage) {
         
-        for index in 0 ... tilesArray.count - 1 {
-            
-            if tilesArray[index].source == imageUrl {
-                
-                guard let imageData = image.pngData() as NSData? else { print("Couldn't get image data"); return }
-                SizeManager.shared.saveSize(self.tilesArray[index], andImage: imageData)
-            }
-        }
+        guard let size = tilesArray.first(where: { $0.source == imageUrl }) else { print("Couldn't find image with url"); return }
+        guard let imageData = image.pngData() as NSData? else { print("Couldn't get image data"); return }
+        
+        SizeManager.shared.saveSize(size, andImage: imageData)
     }
     
     func saveLargeImage(withUrl url: String, andImage image: UIImage) {
         
-        for index in 0 ... largeImageArray.count - 1 {
-            
-            if largeImageArray[index].source == url {
-                
-                guard let imageData = image.pngData() as NSData? else { print("Couldn't get image data"); return }
-    
-                SizeManager.shared.saveSize(largeImageArray[index], andImage: imageData)
-            }
-        }
+        guard let size = largeImageArray.first(where: { $0.source == url }) else { print("Couldn't find image with url"); return }
+        guard let imageData = image.pngData() as NSData? else { print("Couldn't get image data"); return }
+        
+        SizeManager.shared.saveSize(size, andImage: imageData)
     }
     
     func fetchStoredImages() {
@@ -209,19 +204,25 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
         
         do {
             
-            if let results = try SizeManager.shared.context?.fetch(fetchRequest) as? [NSManagedObject] {
+            guard let results = try SizeManager.shared.context?.fetch(fetchRequest) as? [NSManagedObject] else { return }
+            guard let sizeMOArray = results as? [SizeManagedObject] else { return }
+            print(sizeMOArray.count)
+            
+            sizeMOArray.forEach { sizeMO in
                 
-                for result in results {
+                if self.sizeArray.contains(where: { $0.id == sizeMO.id && ($0.label == "Large Square" || $0.label == "Large") }) {
+                    return
+                } else {
                     
-                    let size = SizeMapper().size(fromManagedObject: result as! SizeManagedObject)
+                    let size = SizeMapper().size(fromManagedObject: sizeMO)
                     
-                    sizeArray.append(size)
-                    tilesArray.append(contentsOf: sizeArray.filter({ $0.label == "Large Square" && $0.id != size.id }))
-                    largeImageArray.append(contentsOf: sizeArray.filter({ $0.label == "Large" }))
-                    
-                    view?.setImages()
+                    self.sizeArray.append(size)
                 }
             }
+            
+            self.tilesArray.append(contentsOf: self.sizeArray.filter({ $0.label == "Large Square" }))
+            self.largeImageArray.append(contentsOf: self.sizeArray.filter({ $0.label == "Large" }))
+            self.view?.setImages()
             
         } catch let error {
             print("Fetch error: \(error)")

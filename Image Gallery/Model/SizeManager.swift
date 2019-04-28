@@ -17,19 +17,26 @@ class SizeManager {
     
     func saveSize(_ size: Size, andImage image: NSData) {
         
-        guard let context = context else { print("Error getting context"); return }
-        let entity        = SizeManagedObject(entity: SizeManagedObject.entity(), insertInto: context)
+        let hasElement = hasElementInDB(withId: size.id!)
         
-        entity.id     = size.id
-        entity.label  = size.label
-        entity.width  = size.width
-        entity.height = size.width
-        entity.source = size.source
-        entity.url    = size.url
-        entity.media  = size.media
-        entity.image  = image
-        
-        appDelegate?.saveContext()
+        if hasElement {
+            return
+        } else {
+            
+            let entity = NSEntityDescription.insertNewObject(forEntityName: "SizeManagedObject", into: context!) as? SizeManagedObject
+            
+            entity?.id     = size.id
+            entity?.label  = size.label
+            entity?.width  = size.width
+            entity?.height = size.width
+            entity?.source = size.source
+            entity?.url    = size.url
+            entity?.media  = size.media
+            entity?.image  = image
+
+            appDelegate?.saveContext()
+            print("Image with id \(entity?.id) of type \(entity?.label) saved")
+        }
     }
     
     func deleteAll(_ entity: String) {
@@ -55,5 +62,31 @@ class SizeManager {
         }
         
         appDelegate?.saveContext()
+    }
+    
+    func hasElementInDB(withId id: String) -> Bool {
+        
+        let pred = NSPredicate(format: "id == %@", id)
+        
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "SizeManagedObject")
+        fetchRequest.predicate = pred
+        
+        do {
+            
+            guard let results = try context?.fetch(fetchRequest) as? [NSManagedObject] else { return false }
+            
+            guard let sizeMOArray = results as? [SizeManagedObject] else { return false }
+            
+            if sizeMOArray.contains(where: { $0.id == id }) {
+                return true
+            } else {
+                return false
+            }
+            
+        } catch let error {
+            print(error)
+        }
+        
+        return false
     }
 }

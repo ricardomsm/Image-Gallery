@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Reachability
 
 fileprivate struct ImageGalleryDimensions {
     fileprivate static let trailingAndLeadingMargin: CGFloat = 15
@@ -21,7 +20,6 @@ class ImageGalleryViewController: UIViewController, ImageGalleryViewControllerPr
     @IBOutlet var imageSearchBar             : UISearchBar!
     private var largeImageView               : UIImageView!
     private lazy var imageGalleryViewModel   = ImageGalleryViewModel(withView: self)
-    private let hasInternetConnection        = Reachability()?.connection != .none
 
     
     //MARK: - Life cycle methods
@@ -32,7 +30,7 @@ class ImageGalleryViewController: UIViewController, ImageGalleryViewControllerPr
         setupImageGalleryCollectionView()
         addDismissalTapGesture()
         
-        if !hasInternetConnection {
+        if !imageGalleryViewModel.hasInternetConnection {
             imageGalleryViewModel.fetchStoredImages()
         }
     }
@@ -116,8 +114,9 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCollectionViewCell
+        cell.imageUrl = ""
         
-        if !hasInternetConnection {
+        if !imageGalleryViewModel.hasInternetConnection {
             let image = UIImage(data: imageGalleryViewModel.tilesArray[indexPath.row].image! as Data)
             cell.imageView.image = image
         } else {
@@ -136,7 +135,7 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
 
         clearLargeImage()
         
-        if !hasInternetConnection {
+        if !imageGalleryViewModel.hasInternetConnection {
             
             let selectedImageId = imageGalleryViewModel.tilesArray[indexPath.row].id
             guard let imageData = imageGalleryViewModel.largeImageArray.filter({ $0.id == selectedImageId }).first?.image else { print("Error getting image data"); return }
@@ -163,7 +162,7 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
-        if !hasInternetConnection {
+        if !imageGalleryViewModel.hasInternetConnection {
             return
         }
         
@@ -211,12 +210,20 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
 //MARK: - Search bar delegate methods
 extension ImageGalleryViewController: UISearchBarDelegate {
     
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        SizeManager.shared.deleteAll("SizeManagedObject")
+    }
+    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         view.endEditing(true)
         cleanGallery()
         
-        imageGalleryViewModel.fetchImages(withText: searchBar.text!)
+        if let text = searchBar.text {
+            imageGalleryViewModel.fetchImages(withText: text)
+        } else {
+            Alert.showGeneralAlert(withMessage: "Please enter some text.")
+        }
     }
     
     private func cleanGallery() {
