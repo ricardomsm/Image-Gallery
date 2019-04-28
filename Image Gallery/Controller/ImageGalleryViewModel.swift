@@ -51,9 +51,15 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
             self.view?.setImages()
             
             if self.isFetchingMore {
+                
                 self.isFetchingMore = false
+                
                 DispatchQueue.main.async {
                     Alert.dismissLoadingIndicator()
+                }
+            } else {
+                DispatchQueue.main.async {
+                    SizeManager.shared.deleteAll("SizeManagedObject")
                 }
             }
             
@@ -160,6 +166,7 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
         }
     }
     
+    //MARK: Persistence methods
     func saveTileImage(from cell: PhotoCollectionViewCell) {
         
         for index in 0 ... tilesArray.count - 1 {
@@ -195,16 +202,20 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
             if let results = try SizeManager.shared.context?.fetch(fetchRequest) as? [NSManagedObject] {
                 
                 for result in results {
+                    
                     let size = SizeMapper().size(fromManagedObject: result as! SizeManagedObject)
+                    
                     sizeArray.append(size)
-                    print(sizeArray)
+                    tilesArray.append(contentsOf: sizeArray.filter({ $0.label == "Large Square" }))
+                    largeImageArray.append(contentsOf: sizeArray.filter({ $0.label == "Large" }))
+                    
+                    view?.setImages()
                 }
             }
             
         } catch let error {
             print("Fetch error: \(error)")
         }
-        
-        
     }
+    
 }

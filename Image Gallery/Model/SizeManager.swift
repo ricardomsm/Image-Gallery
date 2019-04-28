@@ -32,4 +32,22 @@ class SizeManager {
         
         appDelegate?.saveContext()
     }
+    
+    func deleteAll(_ entity: String) {
+        
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
+        fetchRequest.returnsObjectsAsFaults = false
+        
+        do {
+            guard let results = try context?.fetch(fetchRequest) else { print("Error getting results"); return }
+            for object in results {
+                guard let objectData = object as? NSManagedObject else {continue}
+                context?.delete(objectData)
+            }
+        } catch let error {
+            print("Detele all data in \(entity) error :", error)
+        }
+        
+        appDelegate?.saveContext()
+    }
 }

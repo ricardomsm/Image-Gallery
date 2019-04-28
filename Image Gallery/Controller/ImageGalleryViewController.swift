@@ -21,7 +21,7 @@ class ImageGalleryViewController: UIViewController, ImageGalleryViewControllerPr
     @IBOutlet var imageSearchBar             : UISearchBar!
     private var largeImageView               : UIImageView!
     private lazy var imageGalleryViewModel   = ImageGalleryViewModel(withView: self)
-    private let reachability                 = Reachability()
+    private let hasInternetConnection        = Reachability()?.connection != .none
 
     
     //MARK: - Life cycle methods
@@ -32,7 +32,7 @@ class ImageGalleryViewController: UIViewController, ImageGalleryViewControllerPr
         setupImageGalleryCollectionView()
         addDismissalTapGesture()
         
-        if reachability?.connection == .none {
+        if !hasInternetConnection {
             imageGalleryViewModel.fetchStoredImages()
         }
     }
@@ -122,19 +122,48 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCollectionViewCell
         
-        if let imageUrl = imageGalleryViewModel.tilesArray[indexPath.row].source {
-            // We use the url as to identify which cell should load which image
-            cell.imageUrl = imageUrl
-            setupCell(withUrl: imageUrl, image: imageGalleryViewModel.imageCache.object(forKey: NSString(string: imageUrl)), and: cell)
+        if !hasInternetConnection {
+            let image = UIImage(data: imageGalleryViewModel.tilesArray[indexPath.row].image! as Data)
+            cell.imageView.image = image
+        } else {
+            
+            if let imageUrl = imageGalleryViewModel.tilesArray[indexPath.row].source {
+                // We use the url as to identify which cell should load which image
+                cell.imageUrl = imageUrl
+                setupCell(withUrl: imageUrl, image: imageGalleryViewModel.imageCache.object(forKey: NSString(string: imageUrl)), and: cell)
+            }
         }
-    
+        
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 
         clearLargeImage()
-        imageGalleryViewModel.showLargeImage(forIndexPath: indexPath)
+        
+        if !hasInternetConnection {
+            
+            let selectedImageId = imageGalleryViewModel.tilesArray[indexPath.row].id
+            guard let imageData = imageGalleryViewModel.largeImageArray.filter({ $0.id == selectedImageId }).first?.image else { print("Error getting image data"); return }
+            
+            let image = UIImage(data: imageData as Data)
+            
+            self.largeImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
+            self.largeImageView.contentMode = .scaleAspectFit
+            
+            self.largeImageView.image = image
+            self.largeImageView.image?.draw(at: self.largeImageView.center)
+            
+            UIView.animate(withDuration: 0.4, animations: {
+                self.largeImageView.backgroundColor = UIColor(red: 211/255, green: 211/255, blue: 211/255, alpha: 0.4)
+                self.view.addSubview(self.largeImageView)
+                self.view.bringSubviewToFront(self.largeImageView)
+            })
+            
+            
+        } else {
+            imageGalleryViewModel.showLargeImage(forIndexPath: indexPath)
+        }
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
