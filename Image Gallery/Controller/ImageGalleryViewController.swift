@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Reachability
 
 fileprivate struct ImageGalleryDimensions {
     fileprivate static let trailingAndLeadingMargin: CGFloat = 15
@@ -20,6 +21,7 @@ class ImageGalleryViewController: UIViewController, ImageGalleryViewControllerPr
     @IBOutlet var imageSearchBar             : UISearchBar!
     private var largeImageView               : UIImageView!
     private lazy var imageGalleryViewModel   = ImageGalleryViewModel(withView: self)
+    private let reachability                 = Reachability()
 
     
     //MARK: - Life cycle methods
@@ -29,7 +31,10 @@ class ImageGalleryViewController: UIViewController, ImageGalleryViewControllerPr
         setupSearchBar()
         setupImageGalleryCollectionView()
         addDismissalTapGesture()
-        imageGalleryViewModel.fetchStoredImages()
+        
+        if reachability?.connection == .none {
+            imageGalleryViewModel.fetchStoredImages()
+        }
     }
     
     //MARK: - View Model Methods

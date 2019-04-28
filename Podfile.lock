@@ -1,0 +1,16 @@
+PODS:
+  - ReachabilitySwift (4.3.1)
+
+DEPENDENCIES:
+  - ReachabilitySwift
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - ReachabilitySwift
+
+SPEC CHECKSUMS:
+  ReachabilitySwift: 4032e2f59586e11e3b0ebe15b167abdd587a388b
+
+PODFILE CHECKSUM: 3612aaf808312a2a73a68d22508043821b0b16d4
+
+COCOAPODS: 1.5.3
