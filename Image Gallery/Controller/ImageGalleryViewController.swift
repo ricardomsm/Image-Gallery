@@ -153,8 +153,6 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
                 self.view.addSubview(self.largeImageView)
                 self.view.bringSubviewToFront(self.largeImageView)
             })
-            
-            
         } else {
             imageGalleryViewModel.showLargeImage(forIndexPath: indexPath)
         }
@@ -163,6 +161,7 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
         if !imageGalleryViewModel.hasInternetConnection {
+            Alert.showGeneralAlert(withMessage: "Please enable internet connection to search for images")
             return
         }
         

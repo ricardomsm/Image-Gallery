@@ -206,7 +206,6 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
             
             guard let results = try SizeManager.shared.context?.fetch(fetchRequest) as? [NSManagedObject] else { return }
             guard let sizeMOArray = results as? [SizeManagedObject] else { return }
-            print(sizeMOArray.count)
             
             sizeMOArray.forEach { sizeMO in
                 
