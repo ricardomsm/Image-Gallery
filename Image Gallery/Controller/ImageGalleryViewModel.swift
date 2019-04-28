@@ -23,7 +23,7 @@ class ImageGalleryViewModel: ImageGalleryViewModelProtocol {
     lazy var totalPages       = 0
     var isFetchingMore        = false
     var lastUserEnteredText   = ""
-    let hasInternetConnection = false
+    let hasInternetConnection = Reachability()?.connection != .none
     
     init(withView view: ImageGalleryViewController) {
         self.view = view

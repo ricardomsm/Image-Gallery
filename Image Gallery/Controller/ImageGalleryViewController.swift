@@ -117,7 +117,9 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
         cell.imageUrl = ""
         
         if !imageGalleryViewModel.hasInternetConnection {
-            let image = UIImage(data: imageGalleryViewModel.tilesArray[indexPath.row].image! as Data)
+            
+            guard let imageData = imageGalleryViewModel.tilesArray[indexPath.row].image else { print("error getting image data"); return cell }
+            let image = UIImage(data: imageData as Data)
             cell.imageView.image = image
         } else {
             
@@ -138,21 +140,18 @@ extension ImageGalleryViewController: UICollectionViewDelegate, UICollectionView
         if !imageGalleryViewModel.hasInternetConnection {
             
             let selectedImageId = imageGalleryViewModel.tilesArray[indexPath.row].id
-            guard let imageData = imageGalleryViewModel.largeImageArray.filter({ $0.id == selectedImageId }).first?.image else { print("Error getting image data"); return }
+            guard let imageData = imageGalleryViewModel.largeImageArray.filter({ $0.id == selectedImageId }).first?.image else { print("Error getting image data")
+                Alert.showGeneralAlert(withMessage: "Please enable internet connection to get larger image")
+                return
+            }
             
-            let image = UIImage(data: imageData as Data)
+            guard let image = UIImage(data: imageData as Data) else {
+                print("error getting image from data")
+                Alert.showGeneralAlert(withMessage: "Please enable internet connection to get larger image")
+                return
+            }
             
-            self.largeImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
-            self.largeImageView.contentMode = .scaleAspectFit
-            
-            self.largeImageView.image = image
-            self.largeImageView.image?.draw(at: self.largeImageView.center)
-            
-            UIView.animate(withDuration: 0.4, animations: {
-                self.largeImageView.backgroundColor = UIColor(red: 211/255, green: 211/255, blue: 211/255, alpha: 0.4)
-                self.view.addSubview(self.largeImageView)
-                self.view.bringSubviewToFront(self.largeImageView)
-            })
+            setLargeImage(withImage: image)
         } else {
             imageGalleryViewModel.showLargeImage(forIndexPath: indexPath)
         }
